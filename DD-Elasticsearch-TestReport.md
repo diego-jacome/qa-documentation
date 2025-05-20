@@ -238,8 +238,23 @@
     }
   }
 }
+```
+</details>
 
-  
+## Some Queries
+
+### File Size = 1 MB
+![image](https://github.com/user-attachments/assets/9e6eafdc-0d07-4537-bea9-f2d81050ecc9)
+![image](https://github.com/user-attachments/assets/f2a8791a-e92a-4a6e-8e14-433083115c2e)
+![image](https://github.com/user-attachments/assets/f72e6c7f-1c18-4f83-92a3-be2072c59fbb)
+
+### File size = 10.00 MB
+![image](https://github.com/user-attachments/assets/059b4e5f-cab3-4279-bd96-20914f34c243)
+![image](https://github.com/user-attachments/assets/7ae59200-c768-48bb-bb41-efe9180b4c4a)
+
+
+
+
 
 
 
