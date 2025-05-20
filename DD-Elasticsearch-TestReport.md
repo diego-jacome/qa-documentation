@@ -1,9 +1,9 @@
 # 🔍 Elasticsearch Test Report - DD Environment
 
 **QA Analyst**: Diego Jácome  
-**Fecha**: 2025-05-19  
-**Entorno**: QA  
-**Objetivo**: Validar índices, mappings y resultados de queries en el clúster de Elasticsearch usado por Dynamic Docs.
+**Date**: 2025-05-19  
+**Environment**: QA  
+**Objective**: Validate indexes, mappings and queries results in the Elastic Search cluster used by DD.
 
 ---
 
@@ -11,17 +11,17 @@
 
 | Parámetro | Valor |
 |----------|-------|
-| Endpoint base | `https://dd-integrated-search-test.kb.southcentralus.azure.elastic-cloud.com/app/dev_tools#/console` |
+| Base Url | `https://dd-integrated-search-test.kb.southcentralus.azure.elastic-cloud.com/app/dev_tools#/console` |
 | Tenant | `25` |
-| Índice evaluado | `25_documents` |
-| Herramienta utilizada | Elasticsearch console |
-| Autenticación | User and password |
+| Evaluated Index | `25_documents` |
+| Tool Used | Elasticsearch console |
+| Authentication| User and password |
 
 ---
 
-## 2. ✅ Casos de prueba ejecutados
+## 2. ✅ Executed test cases
 
-### TC01 - Validar existencia del índice
+### TC01 - Validate the existance of the index
 
 - **Query**:
   ```http
