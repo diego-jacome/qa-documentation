@@ -1,15 +1,15 @@
-# 🔍 Elasticsearch Test Report - DD Environment
+# 🔍 Elasticsearch Test Report
 
 **QA Analyst**: Diego Jácome  
 **Date**: 2025-05-19  
 **Environment**: QA  
-**Objective**: Validate indexes, mappings and queries results in the Elastic Search cluster used by DD.
+**Objective**: Index validation, mappings and query results in the Elastic Search cluster used by DD.
 
 ---
 
-## 1. 🔧 Configuración inicial
+## 1. 🔧 Initial Configuration
 
-| Parámetro | Valor |
+| Parameter | Value |
 |----------|-------|
 | Base Url | `https://dd-integrated-search-test.kb.southcentralus.azure.elastic-cloud.com/app/dev_tools#/console` |
 | Tenant | `25` |
