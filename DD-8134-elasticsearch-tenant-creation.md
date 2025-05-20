@@ -1,9 +1,9 @@
-# 🧪 Test Report - [Project or Feature Name]
+# 🧪 Test Report - Define a scalable sharding strategy for ElasticSearch
 
-**QA Analyst**: [Your Name]  
-**Date**: [YYYY-MM-DD]  
-**Environment**: [Dev | QA | Staging | Prod]  
-**Tested Version**: [Version number or commit]  
+**QA Analyst**: Diego Jácome
+**Date**: 2025-20-05 
+**Environment**: QA  
+**Tested Version**: 
 **Objective**: [Brief description of the testing purpose]
 
 ---
