@@ -239,7 +239,7 @@
   }
 }
 ```
-</details>
+
 
 ## Some Queries
 
