@@ -6,6 +6,9 @@ La base de datos Endpoints también incluye una plantilla de endpoint para docum
 
 </aside>
 
+> [!IMPORTANT]  
+> Crucial information necessary for users to succeed.
+
 # Genérico
 
 ## Introducción
