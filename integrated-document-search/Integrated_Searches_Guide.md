@@ -28,6 +28,7 @@
 
 This repository implements an advanced API for searching and filtering enterprise/document data stored in Elasticsearch, enabling complex and aggregated queries, and also provides a Flink-based data processing pipeline.
 The main project is a system for performing advanced searches over document, location, and project data stored in Elasticsearch.
+![alt text](image-1.png)
 The core of the system is a service called "Search Service," implemented as a .NET 8 Web API. It exposes a **/api/search** endpoint that allows for complex, faceted queries using nested filters over indexed data.
 The service is designed to be extensible, modular, and efficient, allowing for cross-index attribute resolution and aggregated queries in Elasticsearch.
 Internally, it is divided into layers (API, Application, Infrastructure) and modules focused on handling different search domains (documents, locations, and projects).
