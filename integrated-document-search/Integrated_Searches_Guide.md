@@ -39,7 +39,8 @@ Internally, it is divided into layers (API, Application, Infrastructure) and mod
 This endpoint allows the web app to communicate with Elastic Search:
 https://test-api.ondemandquorum.com/search/v1/api/Search
 
-![alt text](image.png)
+<img width="1136" height="647" alt="image" src="https://github.com/user-attachments/assets/d830e16c-66f5-4160-9a89-413e52af4a72" />
+
 
 #### Full Request Body Example
 
@@ -164,7 +165,8 @@ https://test-api.ondemandquorum.com/search/v1/api/Search
 
 ### **Nested objects**
 
-![alt text](image-2.png)
+<img width="620" height="304" alt="image-2" src="https://github.com/user-attachments/assets/41733f59-0c35-415f-9e29-7896c77a0992" />
+
 Elasticsearch mapping
 
 The following are nested objects in the mapping:
