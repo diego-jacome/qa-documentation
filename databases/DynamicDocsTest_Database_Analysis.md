@@ -6,6 +6,28 @@
 
 ---
 
+## Índice
+
+- [Resumen](#resumen)
+- [1. Configuración y Multi-Tenancy (Núcleo)](#1-configuración-y-multi-tenancy-núcleo)
+- [2. Usuarios, Roles y Permisos (RBAC)](#2-usuarios-roles-y-permisos-rbac)
+- [3. Jerarquía de Ubicaciones (Department → Cabinet → Folder)](#3-jerarquía-de-ubicaciones-department--cabinet--folder)
+- [4. Documentos y Contenido (Core del DMS)](#4-documentos-y-contenido-core-del-dms)
+- [5. Templates y Atributos (Tipificación de documentos)](#5-templates-y-atributos-tipificación-de-documentos)
+- [6. Packets / Proyectos](#6-packets--proyectos)
+- [7. Entidades y Propiedades (Metadata dinámica)](#7-entidades-y-propiedades-metadata-dinámica)
+- [8. OCR, Extracción de Datos y Análisis de Texto](#8-ocr-extracción-de-datos-y-análisis-de-texto)
+- [9. Importación y Exportación de Documentos](#9-importación-y-exportación-de-documentos)
+- [10. Email Ingestion (Capturas desde correo)](#10-email-ingestion-capturas-desde-correo)
+- [11. Notificaciones y Mensajería](#11-notificaciones-y-mensajería)
+- [12. Auditoría y Tracking](#12-auditoría-y-tracking)
+- [13. Tablas Auxiliares y CDC](#13-tablas-auxiliares-y-cdc)
+- [14. Atributos de Locación (Location Attributes)](#14-atributos-de-locación-location-attributes)
+- [Diagrama de Relaciones Principales (Simplificado)](#diagrama-de-relaciones-principales-simplificado)
+- [Relaciones Foreign Key Completas (252 total)](#relaciones-foreign-key-completas-252-total)
+
+---
+
 ## Resumen
 
 Es un sistema de **gestión documental (DMS)** multi-tenant. La arquitectura se basa en:
@@ -222,6 +244,75 @@ Department (ej: "Contabilidad")
 | **ScannerConfigurations** | Configuraciones de escáner |
 | **DBVersion / VersionInfo** | Control de versiones de la BD |
 | **ColumnConfig / ColumnDisplayOrder** | Configuración de columnas visibles |
+
+---
+
+## 14. Atributos de Locación (Location Attributes)
+
+Los **atributos de locación** (metadata/propiedades asociadas a *ubicaciones* como Department/Cabinet/Folder) se encuentran en el bloque de **Entidades y Propiedades (Metadata dinámica)**, usando **`ConfigResource`** para identificar el recurso "Location".
+
+En esta BD, el patrón es:
+
+- **Definición de "qué atributos existen" para un recurso**  
+  → `EntityProperties` (por `ClientID` + `ResourceID`)
+- **Lista de propiedades/atributos dentro de esa entidad**  
+  → `Properties` (por `EntityPropertiesID`)
+- **Valores capturados**  
+  → `PropertyValue` (por `PropertyId`)
+
+### Tablas clave (donde mirar)
+
+```text
+EntityProperties   -> define el set de propiedades por recurso (ej. Location) y cliente
+Properties         -> catálogo de propiedades/atributos (nombre, etc.) dentro de EntityProperties
+PropertyValue      -> valores guardados de esas propiedades
+ConfigResource     -> catálogo de recursos; aquí buscas el Resource que representa Location
+```
+
+### Cómo ubicarlos concretamente
+
+1) **Encuentra el ResourceID de "Location"** en `ConfigResource`.  
+   (A veces se llama `Location`, `Locations`, `VirtualLocation` o similar; depende del naming real en tu instancia.)
+
+2) Con ese `ResourceID`, busca en `EntityProperties` las filas del cliente (`ClientID`) para ese recurso.
+
+3) Con `EntityPropertiesID`, listás las propiedades en `Properties`.
+
+4) Los valores van en `PropertyValue` enlazando por `PropertyId`.
+
+### Ejemplo de consulta guía
+
+```sql
+-- 1) ubicar el ResourceID para "Location"
+SELECT *
+FROM ConfigResource
+WHERE Name LIKE '%Location%';
+
+-- 2) ver definiciones de propiedades para ese recurso y cliente
+SELECT *
+FROM EntityProperties
+WHERE ResourceID = <ResourceID_Location>
+  AND ClientID = <ClientID>;
+
+-- 3) listar atributos (propiedades) de esa entidad
+SELECT p.*
+FROM Properties p
+JOIN EntityProperties ep ON ep.EntityPropertiesID = p.EntityPropertiesID
+WHERE ep.ResourceID = <ResourceID_Location>
+  AND ep.ClientID = <ClientID>;
+
+-- 4) ver valores capturados
+SELECT pv.*
+FROM PropertyValue pv
+JOIN Properties p ON p.PropertyID = pv.PropertyId
+JOIN EntityProperties ep ON ep.EntityPropertiesID = p.EntityPropertiesID
+WHERE ep.ResourceID = <ResourceID_Location>
+  AND ep.ClientID = <ClientID>;
+```
+
+### Nota: permisos de locación ≠ atributos de locación
+
+Las tablas como `DepartmentConfigPermission`, `CabinetConfigPermission`, `FolderConfigPermission`, `RootLocationConfigPermission` son **permisos**, no metadata.
 
 ---
 
