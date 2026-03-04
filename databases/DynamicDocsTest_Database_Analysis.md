@@ -30,14 +30,22 @@
 
 ## Resumen
 
+<details>
+<summary>Mostrar contenido</summary>
+
 Es un sistema de **gestión documental (DMS)** multi-tenant. La arquitectura se basa en:
 - **Multi-tenancy** filtrado por `ClientID`
 - **RBAC granular** (permisos a nivel de departamento, gabinete, carpeta, template y proyecto)
 - Soporte para **OCR, extracción de datos, importación/exportación automatizada y captura de email**
 
+</details>
+
 ---
 
 ## 1. CONFIGURACIÓN Y MULTI-TENANCY (Núcleo)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -48,9 +56,14 @@ Es un sistema de **gestión documental (DMS)** multi-tenant. La arquitectura se 
 | **ClientSetting** | Configuraciones específicas por cliente (tipo de búsqueda, etc.) |
 | **ClientUserTab** | Tabs personalizados por cliente |
 
+</details>
+
 ---
 
 ## 2. USUARIOS, ROLES Y PERMISOS (RBAC)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -67,9 +80,14 @@ Es un sistema de **gestión documental (DMS)** multi-tenant. La arquitectura se 
 | **ConfigUserPermission** | Permisos asignados directamente a usuarios |
 | **ConfigQuestion / ConfigUserQuestion** | Preguntas de seguridad para usuarios |
 
+</details>
+
 ---
 
 ## 3. JERARQUÍA DE UBICACIONES (Department → Cabinet → Folder)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 ```
 Department (ej: "Contabilidad")
@@ -91,9 +109,14 @@ Department (ej: "Contabilidad")
 | **FrozenFolder** | Carpetas congeladas (no modificables) |
 | **DefaultFolder** | Carpetas por defecto por cliente |
 
+</details>
+
 ---
 
 ## 4. DOCUMENTOS Y CONTENIDO (Core del DMS)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -111,9 +134,14 @@ Department (ej: "Contabilidad")
 | **FixedContent** | Documentos fijados/pinneados |
 | **TemporaryContent** | Contenido temporal (en proceso de carga) |
 
+</details>
+
 ---
 
 ## 5. TEMPLATES Y ATRIBUTOS (Tipificación de documentos)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -129,9 +157,14 @@ Department (ej: "Contabilidad")
 | **DefaultAttributesForRoles** | Atributos predeterminados por rol |
 | **DefaultAttributesForUpload** | Atributos predeterminados al subir documentos |
 
+</details>
+
 ---
 
 ## 6. PACKETS / PROYECTOS
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -144,9 +177,14 @@ Department (ej: "Contabilidad")
 | **ProjectAutopopulationRole** | Roles para auto-populación de proyectos |
 | **RoleDefaultProject** | Proyecto por defecto por rol |
 
+</details>
+
 ---
 
 ## 7. ENTIDADES Y PROPIEDADES (Metadata dinámica)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -157,9 +195,14 @@ Department (ej: "Contabilidad")
 | **EntityAttributesForRoles** | Atributos de entidad por rol |
 | **DefaultEntityAttributesForRoles** | Atributos de entidad por defecto por rol |
 
+</details>
+
 ---
 
 ## 8. OCR, EXTRACCIÓN DE DATOS Y ANÁLISIS DE TEXTO
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -172,9 +215,14 @@ Department (ej: "Contabilidad")
 | **TextAnalysisEntitiesResult** | Entidades encontradas por análisis |
 | **TextAnalysisKeyPhrasesResult** | Frases clave encontradas por análisis |
 
+</details>
+
 ---
 
 ## 9. IMPORTACIÓN Y EXPORTACIÓN DE DOCUMENTOS
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -190,9 +238,14 @@ Department (ej: "Contabilidad")
 | **ExportContentInProcess / ExportContentRunDetails** | Exportaciones en proceso |
 | **FileUploads / DocumentBatches / UploadStatus** | Gestión de uploads por lotes |
 
+</details>
+
 ---
 
 ## 10. EMAIL INGESTION (Capturas desde correo)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -202,9 +255,14 @@ Department (ej: "Contabilidad")
 | **JobEmailIngestionNotifyUsers** | Usuarios a notificar |
 | **JobEmailIngestionRunDetail** | Detalles de ejecución |
 
+</details>
+
 ---
 
 ## 11. NOTIFICACIONES Y MENSAJERÍA
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -216,9 +274,14 @@ Department (ej: "Contabilidad")
 | **Message** | Mensajes entre usuarios (con sender/receiver) |
 | **UserReadMessage** | Registro de mensajes leídos |
 
+</details>
+
 ---
 
 ## 12. AUDITORÍA Y TRACKING
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -230,9 +293,14 @@ Department (ej: "Contabilidad")
 | **UserRetrieval** | Historial de documentos recuperados |
 | **UserTrackItem** | Items en seguimiento por usuario |
 
+</details>
+
 ---
 
 ## 13. TABLAS AUXILIARES Y CDC
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla | Propósito |
 |-------|-----------|
@@ -245,9 +313,14 @@ Department (ej: "Contabilidad")
 | **DBVersion / VersionInfo** | Control de versiones de la BD |
 | **ColumnConfig / ColumnDisplayOrder** | Configuración de columnas visibles |
 
+</details>
+
 ---
 
 ## 14. Atributos de Locación (Location Attributes)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 Los **atributos de locación** (metadata/propiedades asociadas a *ubicaciones* como Department/Cabinet/Folder) se encuentran en el bloque de **Entidades y Propiedades (Metadata dinámica)**, usando **`ConfigResource`** para identificar el recurso "Location".
 
@@ -314,9 +387,14 @@ WHERE ep.ResourceID = <ResourceID_Location>
 
 Las tablas como `DepartmentConfigPermission`, `CabinetConfigPermission`, `FolderConfigPermission`, `RootLocationConfigPermission` son **permisos**, no metadata.
 
+</details>
+
 ---
 
 ## Diagrama de Relaciones Principales (Simplificado)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 ```
 ConfigClient (tenant)
@@ -342,9 +420,14 @@ ConfigClient (tenant)
 └── ExportServiceConfig / JobContentImport / JobEmailIngestion...
 ```
 
+</details>
+
 ---
 
 ## Relaciones Foreign Key Completas (252 total)
+
+<details>
+<summary>Mostrar contenido</summary>
 
 | Tabla Origen | Columna | Tabla Referenciada | Columna Referenciada |
 |---|---|---|---|
@@ -593,3 +676,5 @@ ConfigClient (tenant)
 | VirtualLocation | ClientID | ConfigClient | ClientID |
 | VirtualLocation | ResourceID | ConfigResource | ResourceID |
 | VirtualLocationEntity | VirtualLocationID | VirtualLocation | VirtualLocationID |
+
+</details>
