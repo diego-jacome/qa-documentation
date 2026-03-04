@@ -1,375 +1,375 @@
-# Análisis de la Base de Datos: DynamicDocsTest
+# Database Analysis: DynamicDocsTest
 
-**Servidor:** Dynamic Docs QA (qa-skywell-db.c2fif7x7ouda.us-west-2.rds.amazonaws.com)  
-**Fecha de análisis:** 28 de febrero de 2026  
-**Total de relaciones (Foreign Keys):** 252
-
----
-
-## Índice
-
-- [Resumen](#resumen)
-- [1. Configuración y Multi-Tenancy (Núcleo)](#1-configuración-y-multi-tenancy-núcleo)
-- [2. Usuarios, Roles y Permisos (RBAC)](#2-usuarios-roles-y-permisos-rbac)
-- [3. Jerarquía de Ubicaciones (Department → Cabinet → Folder)](#3-jerarquía-de-ubicaciones-department--cabinet--folder)
-- [4. Documentos y Contenido (Core del DMS)](#4-documentos-y-contenido-core-del-dms)
-- [5. Templates y Atributos (Tipificación de documentos)](#5-templates-y-atributos-tipificación-de-documentos)
-- [6. Packets / Proyectos](#6-packets--proyectos)
-- [7. Entidades y Propiedades (Metadata dinámica)](#7-entidades-y-propiedades-metadata-dinámica)
-- [8. OCR, Extracción de Datos y Análisis de Texto](#8-ocr-extracción-de-datos-y-análisis-de-texto)
-- [9. Importación y Exportación de Documentos](#9-importación-y-exportación-de-documentos)
-- [10. Email Ingestion (Capturas desde correo)](#10-email-ingestion-capturas-desde-correo)
-- [11. Notificaciones y Mensajería](#11-notificaciones-y-mensajería)
-- [12. Auditoría y Tracking](#12-auditoría-y-tracking)
-- [13. Tablas Auxiliares y CDC](#13-tablas-auxiliares-y-cdc)
-- [14. Atributos de Locación (Location Attributes)](#14-atributos-de-locación-location-attributes)
-- [Diagrama de Relaciones Principales (Simplificado)](#diagrama-de-relaciones-principales-simplificado)
-- [Relaciones Foreign Key Completas (252 total)](#relaciones-foreign-key-completas-252-total)
+**Server:** Dynamic Docs QA (qa-skywell-db.c2fif7x7ouda.us-west-2.rds.amazonaws.com)  
+**Analysis date:** February 28, 2026  
+**Total relationships (Foreign Keys):** 252
 
 ---
 
-## Resumen
+## Table of Contents
 
-Es un sistema de **gestión documental (DMS)** multi-tenant. La arquitectura se basa en:
-- **Multi-tenancy** filtrado por `ClientID`
-- **RBAC granular** (permisos a nivel de departamento, gabinete, carpeta, template y proyecto)
-- Soporte para **OCR, extracción de datos, importación/exportación automatizada y captura de email**
+- [Summary](#summary)
+- [1. Configuration and Multi-Tenancy (Core)](#1-configuration-and-multi-tenancy-core)
+- [2. Users, Roles and Permissions (RBAC)](#2-users-roles-and-permissions-rbac)
+- [3. Location Hierarchy (Department → Cabinet → Folder)](#3-location-hierarchy-department--cabinet--folder)
+- [4. Documents and Content (DMS Core)](#4-documents-and-content-dms-core)
+- [5. Templates and Attributes (Document Typing)](#5-templates-and-attributes-document-typing)
+- [6. Packets / Projects](#6-packets--projects)
+- [7. Entities and Properties (Dynamic Metadata)](#7-entities-and-properties-dynamic-metadata)
+- [8. OCR, Data Extraction and Text Analysis](#8-ocr-data-extraction-and-text-analysis)
+- [9. Document Import and Export](#9-document-import-and-export)
+- [10. Email Ingestion](#10-email-ingestion)
+- [11. Notifications and Messaging](#11-notifications-and-messaging)
+- [12. Auditing and Tracking](#12-auditing-and-tracking)
+- [13. Auxiliary Tables and CDC](#13-auxiliary-tables-and-cdc)
+- [14. Location Attributes](#14-location-attributes)
+- [Simplified Main Relationship Diagram](#simplified-main-relationship-diagram)
+- [Complete Foreign Key Relationships (252 total)](#complete-foreign-key-relationships-252-total)
 
 ---
 
-## 1. CONFIGURACIÓN Y MULTI-TENANCY (Núcleo)
+## Summary
+
+It is a multi-tenant **Document Management System (DMS)**. The architecture is based on:
+- **Multi-tenancy** filtered by `ClientID`
+- **Granular RBAC** (permissions at department, cabinet, folder, template and project level)
+- Support for **OCR, data extraction, automated import/export and email capture**
+
+---
+
+## 1. CONFIGURATION AND MULTI-TENANCY (Core)
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **ConfigClient** | Tabla central de clientes/tenants. Casi todas las tablas apuntan aquí via `ClientID` |
-| **ConfigState** | Catálogo de estados (geográficos). Referenciado por `ConfigClient` y `ConfigUser` |
-| **ConfigModule** | Módulos funcionales del sistema |
-| **ClientModule** | Relación N:N entre clientes y módulos habilitados |
-| **ClientSetting** | Configuraciones específicas por cliente (tipo de búsqueda, etc.) |
-| **ClientUserTab** | Tabs personalizados por cliente |
+| Table | Purpose |
+|-------|---------|
+| **ConfigClient** | Central clients/tenants table. Almost all tables point here via `ClientID` |
+| **ConfigState** | Geographic states catalog. Referenced by `ConfigClient` and `ConfigUser` |
+| **ConfigModule** | System functional modules |
+| **ClientModule** | N:N relationship between clients and enabled modules |
+| **ClientSetting** | Client-specific settings (search type, etc.) |
+| **ClientUserTab** | Custom tabs per client |
 
 </details>
 
 ---
 
-## 2. USUARIOS, ROLES Y PERMISOS (RBAC)
+## 2. USERS, ROLES AND PERMISSIONS (RBAC)
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **ConfigUser** | Usuarios del sistema → pertenecen a `ConfigClient`, tienen `UserType` y `UserCategory` |
-| **ConfigUserType** | Tipos de usuario |
-| **ConfigUserCathegory** | Categorías de usuario |
-| **ConfigRole** | Roles definidos por cliente |
-| **ConfigUserRole** | Relación N:N entre usuarios y roles |
-| **ConfigAction** | Acciones posibles (ver, editar, borrar, etc.) |
-| **ConfigResource** | Recursos del sistema sobre los que se aplican permisos |
-| **ConfigResourceAction** | Relación N:N entre recursos y acciones permitidas |
-| **ConfigPermission** | Permisos = combinación de `Resource` + `Action` |
-| **ConfigRolePermission** | Permisos asignados a roles |
-| **ConfigUserPermission** | Permisos asignados directamente a usuarios |
-| **ConfigQuestion / ConfigUserQuestion** | Preguntas de seguridad para usuarios |
+| Table | Purpose |
+|-------|---------|
+| **ConfigUser** | System users → belong to `ConfigClient`, have `UserType` and `UserCategory` |
+| **ConfigUserType** | User types |
+| **ConfigUserCathegory** | User categories |
+| **ConfigRole** | Roles defined per client |
+| **ConfigUserRole** | N:N relationship between users and roles |
+| **ConfigAction** | Possible actions (view, edit, delete, etc.) |
+| **ConfigResource** | System resources on which permissions are applied |
+| **ConfigResourceAction** | N:N relationship between resources and allowed actions |
+| **ConfigPermission** | Permissions = combination of `Resource` + `Action` |
+| **ConfigRolePermission** | Permissions assigned to roles |
+| **ConfigUserPermission** | Permissions assigned directly to users |
+| **ConfigQuestion / ConfigUserQuestion** | Security questions for users |
 
 </details>
 
 ---
 
-## 3. JERARQUÍA DE UBICACIONES (Department → Cabinet → Folder)
+## 3. LOCATION HIERARCHY (Department → Cabinet → Folder)
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
 ```
-Department (ej: "Contabilidad")
-  └── Cabinet (ej: "Facturas 2025")
-       └── Folder (ej: "Enero")
-            └── Content (documentos)
+Department (e.g.: "Accounting")
+  └── Cabinet (e.g.: "Invoices 2025")
+       └── Folder (e.g.: "January")
+            └── Content (documents)
 ```
 
-| Tabla | Propósito |
-|-------|-----------|
-| **Department** | Nivel más alto de organización → pertenece a `ConfigClient` |
-| **Cabinet** | Contenedor dentro de un departamento |
-| **Folder** | Carpeta dentro de un gabinete |
-| **DepartmentConfigPermission** | Permisos sobre departamentos (Role/User + Action) |
-| **CabinetConfigPermission** | Permisos sobre gabinetes |
-| **FolderConfigPermission** | Permisos sobre carpetas |
-| **RootLocationConfigPermission** | Permisos en nivel raíz de ubicaciones |
-| **DepartmentSpecialLocation** | Ubicaciones especiales por departamento |
-| **FrozenFolder** | Carpetas congeladas (no modificables) |
-| **DefaultFolder** | Carpetas por defecto por cliente |
+| Table | Purpose |
+|-------|---------|
+| **Department** | Highest level of organization → belongs to `ConfigClient` |
+| **Cabinet** | Container within a department |
+| **Folder** | Folder within a cabinet |
+| **DepartmentConfigPermission** | Permissions on departments (Role/User + Action) |
+| **CabinetConfigPermission** | Permissions on cabinets |
+| **FolderConfigPermission** | Permissions on folders |
+| **RootLocationConfigPermission** | Root-level location permissions |
+| **DepartmentSpecialLocation** | Special locations per department |
+| **FrozenFolder** | Frozen folders (non-modifiable) |
+| **DefaultFolder** | Default folders per client |
 
 </details>
 
 ---
 
-## 4. DOCUMENTOS Y CONTENIDO (Core del DMS)
+## 4. DOCUMENTS AND CONTENT (DMS Core)
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **Content** | **Tabla central de documentos**. Referencia a `Folder`, `Template` y `LockedBy` (usuario) |
-| **ContentVersion** | Versiones de un documento → referencia `Content`, `ConfigUser`, `OcrStatus`, `AnalysisStatus` |
-| **ContentVersionComment** | Comentarios en versiones de documentos |
-| **ContentAttribute** | Valores de atributos/metadatos asignados a un documento |
-| **ContentEntity** | Entidades asociadas a un contenido |
-| **ContentHashtag** | Relación N:N entre contenido y hashtags |
-| **ContentDeleted** | Registro de documentos eliminados (quién los borró) |
-| **ContentNotification** | Notificaciones ligadas a documentos y versiones |
-| **ContentReminder** | Recordatorios sobre documentos (con usuario origen/destino y rol) |
-| **ContentReminderExclude** | Usuarios excluidos de recordatorios |
-| **LinkedContent** | Documentos vinculados a otras carpetas (accesos directos) |
-| **FixedContent** | Documentos fijados/pinneados |
-| **TemporaryContent** | Contenido temporal (en proceso de carga) |
+| Table | Purpose |
+|-------|---------|
+| **Content** | **Central documents table**. References `Folder`, `Template` and `LockedBy` (user) |
+| **ContentVersion** | Document versions → references `Content`, `ConfigUser`, `OcrStatus`, `AnalysisStatus` |
+| **ContentVersionComment** | Comments on document versions |
+| **ContentAttribute** | Attribute/metadata values assigned to a document |
+| **ContentEntity** | Entities associated with content |
+| **ContentHashtag** | N:N relationship between content and hashtags |
+| **ContentDeleted** | Deleted documents record (who deleted them) |
+| **ContentNotification** | Notifications linked to documents and versions |
+| **ContentReminder** | Reminders about documents (with source/destination user and role) |
+| **ContentReminderExclude** | Users excluded from reminders |
+| **LinkedContent** | Documents linked to other folders (shortcuts) |
+| **FixedContent** | Pinned documents |
+| **TemporaryContent** | Temporary content (being uploaded) |
 
 </details>
 
 ---
 
-## 5. TEMPLATES Y ATRIBUTOS (Tipificación de documentos)
+## 5. TEMPLATES AND ATTRIBUTES (Document Typing)
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **Template** | Tipos de documento (ej: "Factura", "Contrato") → por cliente |
-| **Attribute** | Definición de atributos/metadatos (nombre, tipo) → por cliente |
-| **AttributeType** | Catálogo de tipos de atributo (texto, número, fecha, lista, etc.) |
-| **TemplateAttribute** | Relación N:N: qué atributos tiene cada template |
-| **AttributeValueOption** | Opciones predefinidas para atributos tipo lista |
-| **AttributeColumn** | Configuración de columnas de atributos |
-| **TemplateFolder** | Relación entre templates y carpetas |
-| **TemplateConfigPermission** | Permisos sobre templates (Role/User + Action) |
-| **RootTemplateConfigPermission** | Permisos raíz sobre templates |
-| **DefaultAttributesForRoles** | Atributos predeterminados por rol |
-| **DefaultAttributesForUpload** | Atributos predeterminados al subir documentos |
+| Table | Purpose |
+|-------|---------|
+| **Template** | Document types (e.g.: "Invoice", "Contract") → per client |
+| **Attribute** | Attribute/metadata definition (name, type) → per client |
+| **AttributeType** | Attribute type catalog (text, number, date, list, etc.) |
+| **TemplateAttribute** | N:N relationship: which attributes each template has |
+| **AttributeValueOption** | Predefined options for list-type attributes |
+| **AttributeColumn** | Attribute column configuration |
+| **TemplateFolder** | Relationship between templates and folders |
+| **TemplateConfigPermission** | Permissions on templates (Role/User + Action) |
+| **RootTemplateConfigPermission** | Root-level template permissions |
+| **DefaultAttributesForRoles** | Default attributes per role |
+| **DefaultAttributesForUpload** | Default attributes when uploading documents |
 
 </details>
 
 ---
 
-## 6. PACKETS / PROYECTOS
+## 6. PACKETS / PROJECTS
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **Packet** | Paquetes/proyectos → por cliente, creados por un usuario |
-| **PacketContent** | Relación N:N: documentos dentro de un paquete |
-| **PacketEntity** | Entidades asociadas a paquetes |
-| **ProjectConfigPermission** | Permisos sobre proyectos |
-| **RootProjectConfigPermission** | Permisos raíz de proyectos |
-| **ProjectCreationRole** | Roles que pueden crear proyectos |
-| **ProjectAutopopulationRole** | Roles para auto-populación de proyectos |
-| **RoleDefaultProject** | Proyecto por defecto por rol |
+| Table | Purpose |
+|-------|---------|
+| **Packet** | Packets/projects → per client, created by a user |
+| **PacketContent** | N:N relationship: documents within a packet |
+| **PacketEntity** | Entities associated with packets |
+| **ProjectConfigPermission** | Permissions on projects |
+| **RootProjectConfigPermission** | Root-level project permissions |
+| **ProjectCreationRole** | Roles that can create projects |
+| **ProjectAutopopulationRole** | Roles for project auto-population |
+| **RoleDefaultProject** | Default project per role |
 
 </details>
 
 ---
 
-## 7. ENTIDADES Y PROPIEDADES (Metadata dinámica)
+## 7. ENTITIES AND PROPERTIES (Dynamic Metadata)
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **EntityProperties** | Definición de propiedades por entidad → referencia `ConfigClient` y `ConfigResource` |
-| **Properties** | Propiedades específicas dentro de una entidad |
-| **PropertyValue** | Valores de las propiedades |
-| **EntityLinking** | Vinculación entre entidades |
-| **EntityAttributesForRoles** | Atributos de entidad por rol |
-| **DefaultEntityAttributesForRoles** | Atributos de entidad por defecto por rol |
+| Table | Purpose |
+|-------|---------|
+| **EntityProperties** | Property definition per entity → references `ConfigClient` and `ConfigResource` |
+| **Properties** | Specific properties within an entity |
+| **PropertyValue** | Property values |
+| **EntityLinking** | Linking between entities |
+| **EntityAttributesForRoles** | Entity attributes per role |
+| **DefaultEntityAttributesForRoles** | Default entity attributes per role |
 
 </details>
 
 ---
 
-## 8. OCR, EXTRACCIÓN DE DATOS Y ANÁLISIS DE TEXTO
+## 8. OCR, DATA EXTRACTION AND TEXT ANALYSIS
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **OcrStatus** | Estados del procesamiento OCR |
-| **DataExtractionEngine** | Motores de extracción de datos |
-| **DataExtractionResult** | Resultados de extracción → por contenido, versión, motor y cliente |
-| **TemplateDataExtractionEngine** | Relación N:N entre templates y motores de extracción |
-| **AnalysisStatus / AnalysisType** | Catálogos para análisis de texto |
-| **TextAnalysisJob** | Trabajos de análisis de texto |
-| **TextAnalysisEntitiesResult** | Entidades encontradas por análisis |
-| **TextAnalysisKeyPhrasesResult** | Frases clave encontradas por análisis |
+| Table | Purpose |
+|-------|---------|
+| **OcrStatus** | OCR processing statuses |
+| **DataExtractionEngine** | Data extraction engines |
+| **DataExtractionResult** | Extraction results → per content, version, engine and client |
+| **TemplateDataExtractionEngine** | N:N relationship between templates and extraction engines |
+| **AnalysisStatus / AnalysisType** | Text analysis catalogs |
+| **TextAnalysisJob** | Text analysis jobs |
+| **TextAnalysisEntitiesResult** | Entities found by analysis |
+| **TextAnalysisKeyPhrasesResult** | Key phrases found by analysis |
 
 </details>
 
 ---
 
-## 9. IMPORTACIÓN Y EXPORTACIÓN DE DOCUMENTOS
+## 9. DOCUMENT IMPORT AND EXPORT
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **JobContentImport** | Jobs de importación de contenido |
-| **JobContentImportRunDetails** | Detalles de ejecución de imports |
-| **ImportJobSettings / ImportJobFtpSettings / ImportJobS3Settings** | Configuraciones de importación (local, FTP, S3) |
-| **ImportHistory / ImportStatus / ImportTypes** | Historial y catálogos de importación |
-| **ExportServiceConfig** | Configuración de servicios de exportación |
-| **ExportServiceRun** | Ejecuciones de exportación |
-| **ExportServiceType / ExportStatus** | Catálogos de exportación |
-| **ExportToCloudSettings** | Configuración para exportar a Box/Dropbox |
-| **ExportToFtpSettings** | Configuración para exportar via FTP |
-| **ExportContentInProcess / ExportContentRunDetails** | Exportaciones en proceso |
-| **FileUploads / DocumentBatches / UploadStatus** | Gestión de uploads por lotes |
+| Table | Purpose |
+|-------|---------|
+| **JobContentImport** | Content import jobs |
+| **JobContentImportRunDetails** | Import execution details |
+| **ImportJobSettings / ImportJobFtpSettings / ImportJobS3Settings** | Import configurations (local, FTP, S3) |
+| **ImportHistory / ImportStatus / ImportTypes** | Import history and catalogs |
+| **ExportServiceConfig** | Export service configuration |
+| **ExportServiceRun** | Export executions |
+| **ExportServiceType / ExportStatus** | Export catalogs |
+| **ExportToCloudSettings** | Configuration for exporting to Box/Dropbox |
+| **ExportToFtpSettings** | Configuration for exporting via FTP |
+| **ExportContentInProcess / ExportContentRunDetails** | Exports in progress |
+| **FileUploads / DocumentBatches / UploadStatus** | Batch upload management |
 
 </details>
 
 ---
 
-## 10. EMAIL INGESTION (Capturas desde correo)
+## 10. EMAIL INGESTION
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **JobEmailIngestionMailSetup** | Configuración de buzones de correo |
-| **JobEmailIngestionRules** | Reglas de clasificación (a qué Department/Cabinet/Folder/Template va) |
-| **JobEmailIngestionHandledMessages** | Mensajes ya procesados |
-| **JobEmailIngestionNotifyUsers** | Usuarios a notificar |
-| **JobEmailIngestionRunDetail** | Detalles de ejecución |
+| Table | Purpose |
+|-------|---------|
+| **JobEmailIngestionMailSetup** | Mailbox configuration |
+| **JobEmailIngestionRules** | Classification rules (which Department/Cabinet/Folder/Template to route to) |
+| **JobEmailIngestionHandledMessages** | Already processed messages |
+| **JobEmailIngestionNotifyUsers** | Users to notify |
+| **JobEmailIngestionRunDetail** | Execution details |
 
 </details>
 
 ---
 
-## 11. NOTIFICACIONES Y MENSAJERÍA
+## 11. NOTIFICATIONS AND MESSAGING
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **ConfigNotification** | Configuración de notificaciones por usuario |
-| **ConfigNotificationType** | Tipos de notificación |
-| **NotificationDeliveryType** | Tipos de entrega (email, in-app, etc.) |
-| **Notification** | Notificaciones enviadas |
-| **NotificationHistory** | Historial de entregas |
-| **Message** | Mensajes entre usuarios (con sender/receiver) |
-| **UserReadMessage** | Registro de mensajes leídos |
+| Table | Purpose |
+|-------|---------|
+| **ConfigNotification** | Per-user notification configuration |
+| **ConfigNotificationType** | Notification types |
+| **NotificationDeliveryType** | Delivery types (email, in-app, etc.) |
+| **Notification** | Sent notifications |
+| **NotificationHistory** | Delivery history |
+| **Message** | Messages between users (with sender/receiver) |
+| **UserReadMessage** | Read messages record |
 
 </details>
 
 ---
 
-## 12. AUDITORÍA Y TRACKING
+## 12. AUDITING AND TRACKING
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **TrackContent** | Tracking de acciones sobre documentos |
-| **TrackLocation** | Tracking de acciones sobre ubicaciones |
-| **TrackPacket** | Tracking de acciones sobre paquetes |
-| **UserSessionInfo** | Información de sesiones de usuario |
-| **UserFeed** | Feed de actividad del usuario |
-| **UserRetrieval** | Historial de documentos recuperados |
-| **UserTrackItem** | Items en seguimiento por usuario |
+| Table | Purpose |
+|-------|---------|
+| **TrackContent** | Tracking of actions on documents |
+| **TrackLocation** | Tracking of actions on locations |
+| **TrackPacket** | Tracking of actions on packets |
+| **UserSessionInfo** | User session information |
+| **UserFeed** | User activity feed |
+| **UserRetrieval** | Retrieved documents history |
+| **UserTrackItem** | Items tracked by user |
 
 </details>
 
 ---
 
-## 13. TABLAS AUXILIARES Y CDC
+## 13. AUXILIARY TABLES AND CDC
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla | Propósito |
-|-------|-----------|
-| **cdc.\*** | Tablas de Change Data Capture (Debezium) para sincronización |
-| **DebeziumHeartbeat** | Heartbeat para CDC |
-| **VirtualLocation / VirtualLocationEntity** | Ubicaciones virtuales |
-| **SavedSearch** | Búsquedas guardadas por usuario |
-| **UserCart** | Carrito de documentos del usuario |
-| **ScannerConfigurations** | Configuraciones de escáner |
-| **DBVersion / VersionInfo** | Control de versiones de la BD |
-| **ColumnConfig / ColumnDisplayOrder** | Configuración de columnas visibles |
+| Table | Purpose |
+|-------|---------|
+| **cdc.\*** | Change Data Capture tables (Debezium) for synchronization |
+| **DebeziumHeartbeat** | Heartbeat for CDC |
+| **VirtualLocation / VirtualLocationEntity** | Virtual locations |
+| **SavedSearch** | Saved searches per user |
+| **UserCart** | User document cart |
+| **ScannerConfigurations** | Scanner configurations |
+| **DBVersion / VersionInfo** | Database version control |
+| **ColumnConfig / ColumnDisplayOrder** | Visible column configuration |
 
 </details>
 
 ---
 
-## 14. Atributos de Locación (Location Attributes)
+## 14. Location Attributes
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-Los **atributos de locación** (metadata/propiedades asociadas a *ubicaciones* como Department/Cabinet/Folder) se encuentran en el bloque de **Entidades y Propiedades (Metadata dinámica)**, usando **`ConfigResource`** para identificar el recurso "Location".
+**Location attributes** (metadata/properties associated with *locations* such as Department/Cabinet/Folder) are found in the **Entities and Properties (Dynamic Metadata)** block, using **`ConfigResource`** to identify the "Location" resource.
 
-En esta BD, el patrón es:
+In this database, the pattern is:
 
-- **Definición de "qué atributos existen" para un recurso**  
-  → `EntityProperties` (por `ClientID` + `ResourceID`)
-- **Lista de propiedades/atributos dentro de esa entidad**  
-  → `Properties` (por `EntityPropertiesID`)
-- **Valores capturados**  
-  → `PropertyValue` (por `PropertyId`)
+- **Definition of "which attributes exist" for a resource**  
+  → `EntityProperties` (by `ClientID` + `ResourceID`)
+- **List of properties/attributes within that entity**  
+  → `Properties` (by `EntityPropertiesID`)
+- **Captured values**  
+  → `PropertyValue` (by `PropertyId`)
 
-### Tablas clave (donde mirar)
+### Key tables (where to look)
 
 ```text
-EntityProperties   -> define el set de propiedades por recurso (ej. Location) y cliente
-Properties         -> catálogo de propiedades/atributos (nombre, etc.) dentro de EntityProperties
-PropertyValue      -> valores guardados de esas propiedades
-ConfigResource     -> catálogo de recursos; aquí buscas el Resource que representa Location
+EntityProperties   -> defines the property set per resource (e.g. Location) and client
+Properties         -> property/attribute catalog (name, etc.) within EntityProperties
+PropertyValue      -> stored values of those properties
+ConfigResource     -> resource catalog; look here for the Resource representing Location
 ```
 
-### Cómo ubicarlos concretamente
+### How to locate them specifically
 
-1) **Encuentra el ResourceID de "Location"** en `ConfigResource`.  
-   (A veces se llama `Location`, `Locations`, `VirtualLocation` o similar; depende del naming real en tu instancia.)
+1) **Find the ResourceID for "Location"** in `ConfigResource`.  
+   (It may be called `Location`, `Locations`, `VirtualLocation` or similar; depends on the actual naming in your instance.)
 
-2) Con ese `ResourceID`, busca en `EntityProperties` las filas del cliente (`ClientID`) para ese recurso.
+2) With that `ResourceID`, search in `EntityProperties` for the client's rows (`ClientID`) for that resource.
 
-3) Con `EntityPropertiesID`, listás las propiedades en `Properties`.
+3) With `EntityPropertiesID`, list the properties in `Properties`.
 
-4) Los valores van en `PropertyValue` enlazando por `PropertyId`.
+4) Values are in `PropertyValue` linked by `PropertyId`.
 
-### Ejemplo de consulta guía
+### Example guide query
 
 ```sql
--- 1) ubicar el ResourceID para "Location"
+-- 1) locate the ResourceID for "Location"
 SELECT *
 FROM ConfigResource
 WHERE Name LIKE '%Location%';
 
--- 2) ver definiciones de propiedades para ese recurso y cliente
+-- 2) view property definitions for that resource and client
 SELECT *
 FROM EntityProperties
 WHERE ResourceID = <ResourceID_Location>
   AND ClientID = <ClientID>;
 
--- 3) listar atributos (propiedades) de esa entidad
+-- 3) list attributes (properties) of that entity
 SELECT p.*
 FROM Properties p
 JOIN EntityProperties ep ON ep.EntityPropertiesID = p.EntityPropertiesID
 WHERE ep.ResourceID = <ResourceID_Location>
   AND ep.ClientID = <ClientID>;
 
--- 4) ver valores capturados
+-- 4) view captured values
 SELECT pv.*
 FROM PropertyValue pv
 JOIN Properties p ON p.PropertyID = pv.PropertyId
@@ -378,18 +378,18 @@ WHERE ep.ResourceID = <ResourceID_Location>
   AND ep.ClientID = <ClientID>;
 ```
 
-### Nota: permisos de locación ≠ atributos de locación
+### Note: location permissions ≠ location attributes
 
-Las tablas como `DepartmentConfigPermission`, `CabinetConfigPermission`, `FolderConfigPermission`, `RootLocationConfigPermission` son **permisos**, no metadata.
+Tables like `DepartmentConfigPermission`, `CabinetConfigPermission`, `FolderConfigPermission`, `RootLocationConfigPermission` are **permissions**, not metadata.
 
 </details>
 
 ---
 
-## Diagrama de Relaciones Principales (Simplificado)
+## Simplified Main Relationship Diagram
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
 ```
 ConfigClient (tenant)
@@ -419,12 +419,12 @@ ConfigClient (tenant)
 
 ---
 
-## Relaciones Foreign Key Completas (252 total)
+## Complete Foreign Key Relationships (252 total)
 
 <details>
-<summary>Mostrar contenido</summary>
+<summary>Show content</summary>
 
-| Tabla Origen | Columna | Tabla Referenciada | Columna Referenciada |
+| Source Table | Column | Referenced Table | Referenced Column |
 |---|---|---|---|
 | Attribute | ClientId | ConfigClient | ClientID |
 | Attribute | TypeId | AttributeType | AttributeTypeID |
