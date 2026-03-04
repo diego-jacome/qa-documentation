@@ -30,15 +30,10 @@
 
 ## Resumen
 
-<details>
-<summary>Mostrar contenido</summary>
-
 Es un sistema de **gestión documental (DMS)** multi-tenant. La arquitectura se basa en:
 - **Multi-tenancy** filtrado por `ClientID`
 - **RBAC granular** (permisos a nivel de departamento, gabinete, carpeta, template y proyecto)
 - Soporte para **OCR, extracción de datos, importación/exportación automatizada y captura de email**
-
-</details>
 
 ---
 
