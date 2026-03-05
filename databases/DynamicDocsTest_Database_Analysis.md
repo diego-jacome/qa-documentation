@@ -331,7 +331,7 @@ In this database, the pattern is:
 ### Key tables (where to look)
 
 ```text
-EntityProperties   -> defines the property set per resource (e.g. Location) and client
+EntityProperties   -> defines the property set per resource (e.g. Location) and client [**Find here the Location Attributes name**]
 Properties         -> property/attribute catalog (name, etc.) within EntityProperties
 PropertyValue      -> stored values of those properties
 ConfigResource     -> resource catalog; look here for the Resource representing Location
