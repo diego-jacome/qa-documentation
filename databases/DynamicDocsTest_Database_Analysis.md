@@ -8,23 +8,29 @@
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [1. Configuration and Multi-Tenancy (Core)](#1-configuration-and-multi-tenancy-core)
-- [2. Users, Roles and Permissions (RBAC)](#2-users-roles-and-permissions-rbac)
-- [3. Location Hierarchy (Department → Cabinet → Folder)](#3-location-hierarchy-department--cabinet--folder)
-- [4. Documents and Content (DMS Core)](#4-documents-and-content-dms-core)
-- [5. Templates and Attributes (Document Typing)](#5-templates-and-attributes-document-typing)
-- [6. Packets / Projects](#6-packets--projects)
-- [7. Entities and Properties (Dynamic Metadata)](#7-entities-and-properties-dynamic-metadata)
-- [8. OCR, Data Extraction and Text Analysis](#8-ocr-data-extraction-and-text-analysis)
-- [9. Document Import and Export](#9-document-import-and-export)
-- [10. Email Ingestion](#10-email-ingestion)
-- [11. Notifications and Messaging](#11-notifications-and-messaging)
-- [12. Auditing and Tracking](#12-auditing-and-tracking)
-- [13. Auxiliary Tables and CDC](#13-auxiliary-tables-and-cdc)
-- [14. Location Attributes](#14-location-attributes)
-- [Simplified Main Relationship Diagram](#simplified-main-relationship-diagram)
-- [Complete Foreign Key Relationships (252 total)](#complete-foreign-key-relationships-252-total)
+- [Database Analysis: DynamicDocsTest](#database-analysis-dynamicdocstest)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [1. CONFIGURATION AND MULTI-TENANCY (Core)](#1-configuration-and-multi-tenancy-core)
+  - [2. USERS, ROLES AND PERMISSIONS (RBAC)](#2-users-roles-and-permissions-rbac)
+  - [3. LOCATION HIERARCHY (Department → Cabinet → Folder)](#3-location-hierarchy-department--cabinet--folder)
+  - [4. DOCUMENTS AND CONTENT (DMS Core)](#4-documents-and-content-dms-core)
+  - [5. TEMPLATES AND ATTRIBUTES (Document Typing)](#5-templates-and-attributes-document-typing)
+  - [6. PACKETS / PROJECTS](#6-packets--projects)
+  - [7. ENTITIES AND PROPERTIES (Dynamic Metadata)](#7-entities-and-properties-dynamic-metadata)
+  - [8. OCR, DATA EXTRACTION AND TEXT ANALYSIS](#8-ocr-data-extraction-and-text-analysis)
+  - [9. DOCUMENT IMPORT AND EXPORT](#9-document-import-and-export)
+  - [10. EMAIL INGESTION](#10-email-ingestion)
+  - [11. NOTIFICATIONS AND MESSAGING](#11-notifications-and-messaging)
+  - [12. AUDITING AND TRACKING](#12-auditing-and-tracking)
+  - [13. AUXILIARY TABLES AND CDC](#13-auxiliary-tables-and-cdc)
+  - [14. Location Attributes](#14-location-attributes)
+    - [Key tables (where to look)](#key-tables-where-to-look)
+    - [How to locate them specifically](#how-to-locate-them-specifically)
+    - [Example guide query](#example-guide-query)
+    - [Note: location permissions ≠ location attributes](#note-location-permissions--location-attributes)
+  - [Simplified Main Relationship Diagram](#simplified-main-relationship-diagram)
+  - [Complete Foreign Key Relationships (252 total)](#complete-foreign-key-relationships-252-total)
 
 ---
 
@@ -376,6 +382,14 @@ JOIN Properties p ON p.PropertyID = pv.PropertyId
 JOIN EntityProperties ep ON ep.EntityPropertiesID = p.EntityPropertiesID
 WHERE ep.ResourceID = <ResourceID_Location>
   AND ep.ClientID = <ClientID>;
+
+-- 5 List of active location attributes
+SELECT * 
+FROM EntityProperties
+  WHERE isactive = 1
+  AND ResourceID in (1,2,3)
+  AND ClientID = 1003
+
 ```
 
 ### Note: location permissions ≠ location attributes
