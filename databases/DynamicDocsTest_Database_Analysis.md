@@ -420,6 +420,16 @@ WHERE ep.IsActive = 1
   AND ep.ResourceID IN (1, 2, 3);
 ```
 
+**Sample results:**
+
+| AttributeName | ResourceID | EntityType | ClientID | AttributeValue | LocationName | LocationID |
+|---|---|---|---|---|---|---|
+| Region Code | 1 | Department | 1003 | US-WEST | Accounting | 5 |
+| Cost Center | 1 | Department | 1003 | CC-4420 | Human Resources | 12 |
+| Retention Period | 2 | Cabinet | 1003 | 7 Years | Invoices 2025 | 34 |
+| Priority | 3 | Folder | 1003 | High | January | 87 |
+| Region Code | 2 | Cabinet | 1003 | US-EAST | Contracts | 41 |
+
 **Key points:**
 - `ResourceID` **1** = Department, **2** = Cabinet, **3** = Folder.
 - `COALESCE` resolves the location name from whichever hierarchy level matches.
