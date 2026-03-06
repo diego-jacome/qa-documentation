@@ -392,6 +392,40 @@ FROM EntityProperties
 
 ```
 
+### Examples
+
+#### Location attributes with values and location name
+
+Returns active, searchable location attributes along with their values and the associated location name (Department, Cabinet or Folder).
+
+```sql
+SELECT 
+    ep.Name AS AttributeName,
+    ep.ResourceID,
+    cr.Name AS EntityType,
+    el.ClientID,
+    pv.Value AS AttributeValue,
+    COALESCE(d.Name, c.Name, f.Name) AS LocationName,
+    COALESCE(d.DepartmentID, c.CabinetID, f.FolderID) AS LocationID
+FROM PropertyValue pv
+JOIN Properties p ON p.PropertyID = pv.PropertyId
+JOIN EntityProperties ep ON ep.EntityPropertiesID = p.EntityPropertiesID
+JOIN ConfigResource cr ON cr.ResourceID = ep.ResourceID
+JOIN EntityLinking el ON el.EntityID = p.EntityID
+LEFT JOIN Department d ON d.DepartmentID = el.EntityID AND ep.ResourceID = 1
+LEFT JOIN Cabinet c ON c.CabinetID = el.EntityID AND ep.ResourceID = 2
+LEFT JOIN Folder f ON f.FolderID = el.EntityID AND ep.ResourceID = 3
+WHERE ep.IsActive = 1
+  AND ep.AvailableForSearch = 1
+  AND ep.ResourceID IN (1, 2, 3);
+```
+
+**Key points:**
+- `ResourceID` **1** = Department, **2** = Cabinet, **3** = Folder.
+- `COALESCE` resolves the location name from whichever hierarchy level matches.
+- Filter by `ep.IsActive = 1` and `ep.AvailableForSearch = 1` to get only active, searchable attributes.
+- You can add filters like `ep.EntityPropertiesID = <id>`, `ep.Name = '<name>'` or `pv.Value = '<value>'` to narrow results.
+
 ### Note: location permissions ≠ location attributes
 
 Tables like `DepartmentConfigPermission`, `CabinetConfigPermission`, `FolderConfigPermission`, `RootLocationConfigPermission` are **permissions**, not metadata.
