@@ -136,21 +136,21 @@ assignees: ""
 <details open>
 <summary><b>7. New Features</b></summary>
 
-- [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
-- [ ] DD-8779 — [Import][FE] Performance: Status doesn't update in large number of files
-- [ ] DD-8743 — [Export][BE] Include metadata in email notifications
-- [ ] DD-8957 — Adjust Confidence Restriction to allow re-processing of any document
-- [ ] DD-8710 — [Import][FE] Ability to Retrieve Job Summary on Older Imports
-- [ ] DD-8602 — [NewImport] Exploration Detail Log shows only counts for files in root path
+- [ ] [DD-8944](https://archeiojira.atlassian.net/browse/DD-8944) — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
+- [ ] [DD-8779](https://archeiojira.atlassian.net/browse/DD-8779) — [Import][FE] Performance: Status doesn't update in large number of files
+- [ ] [DD-8743](https://archeiojira.atlassian.net/browse/DD-8743) — [Export][BE] Include metadata in email notifications
+- [ ] [DD-8957](https://archeiojira.atlassian.net/browse/DD-8957) — Adjust Confidence Restriction to allow re-processing of any document
+- [ ] [DD-8710](https://archeiojira.atlassian.net/browse/DD-8710) — [Import][FE] Ability to Retrieve Job Summary on Older Imports
+- [ ] [DD-8602](https://archeiojira.atlassian.net/browse/DD-8602) — [NewImport] Exploration Detail Log shows only counts for files in root path
 
 </details>
 
 <details open>
 <summary><b>8. Bug Fixes</b></summary>
 
-- [ ] DD-8941 — QEnergyUSA Regular Search Broken
-- [ ] DD-8936 — Batch download for multiple emails error
-- [ ] DD-8928 — Email Ingestion Error — 522: Connection timed out
+- [ ] [DD-8941](https://archeiojira.atlassian.net/browse/DD-8941) — QEnergyUSA Regular Search Broken
+- [ ] [DD-8936](https://archeiojira.atlassian.net/browse/DD-8936) — Batch download for multiple emails error
+- [ ] [DD-8928](https://archeiojira.atlassian.net/browse/DD-8928) — Email Ingestion Error — 522: Connection timed out
 
 </details>
 
@@ -262,21 +262,21 @@ assignees: ""
 <details open>
 <summary><b>7. New Features</b></summary>
 
-- [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
-- [ ] DD-8779 — [Import][FE] Performance: Status doesn't update in large number of files
-- [ ] DD-8743 — [Export][BE] Include metadata in email notifications
-- [ ] DD-8957 — Adjust Confidence Restriction to allow re-processing of any document
-- [ ] DD-8710 — [Import][FE] Ability to Retrieve Job Summary on Older Imports
-- [ ] DD-8602 — [NewImport] Exploration Detail Log shows only counts for files in root path
+- [ ] [DD-8944](https://archeiojira.atlassian.net/browse/DD-8944) — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
+- [ ] [DD-8779](https://archeiojira.atlassian.net/browse/DD-8779) — [Import][FE] Performance: Status doesn't update in large number of files
+- [ ] [DD-8743](https://archeiojira.atlassian.net/browse/DD-8743) — [Export][BE] Include metadata in email notifications
+- [ ] [DD-8957](https://archeiojira.atlassian.net/browse/DD-8957) — Adjust Confidence Restriction to allow re-processing of any document
+- [ ] [DD-8710](https://archeiojira.atlassian.net/browse/DD-8710) — [Import][FE] Ability to Retrieve Job Summary on Older Imports
+- [ ] [DD-8602](https://archeiojira.atlassian.net/browse/DD-8602) — [NewImport] Exploration Detail Log shows only counts for files in root path
 
 </details>
 
 <details open>
 <summary><b>8. Bug Fixes</b></summary>
 
-- [ ] DD-8941 — QEnergyUSA Regular Search Broken
-- [ ] DD-8936 — Batch download for multiple emails error
-- [ ] DD-8928 — Email Ingestion Error — 522: Connection timed out
+- [ ] [DD-8941](https://archeiojira.atlassian.net/browse/DD-8941) — QEnergyUSA Regular Search Broken
+- [ ] [DD-8936](https://archeiojira.atlassian.net/browse/DD-8936) — Batch download for multiple emails error
+- [ ] [DD-8928](https://archeiojira.atlassian.net/browse/DD-8928) — Email Ingestion Error — 522: Connection timed out
 
 </details>
 
@@ -388,21 +388,21 @@ assignees: ""
 <details open>
 <summary><b>7. New Features</b></summary>
 
-- [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
-- [ ] DD-8779 — [Import][FE] Performance: Status doesn't update in large number of files
-- [ ] DD-8743 — [Export][BE] Include metadata in email notifications
-- [ ] DD-8957 — Adjust Confidence Restriction to allow re-processing of any document
-- [ ] DD-8710 — [Import][FE] Ability to Retrieve Job Summary on Older Imports
-- [ ] DD-8602 — [NewImport] Exploration Detail Log shows only counts for files in root path
+- [ ] [DD-8944](https://archeiojira.atlassian.net/browse/DD-8944) — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
+- [ ] [DD-8779](https://archeiojira.atlassian.net/browse/DD-8779) — [Import][FE] Performance: Status doesn't update in large number of files
+- [ ] [DD-8743](https://archeiojira.atlassian.net/browse/DD-8743) — [Export][BE] Include metadata in email notifications
+- [ ] [DD-8957](https://archeiojira.atlassian.net/browse/DD-8957) — Adjust Confidence Restriction to allow re-processing of any document
+- [ ] [DD-8710](https://archeiojira.atlassian.net/browse/DD-8710) — [Import][FE] Ability to Retrieve Job Summary on Older Imports
+- [ ] [DD-8602](https://archeiojira.atlassian.net/browse/DD-8602) — [NewImport] Exploration Detail Log shows only counts for files in root path
 
 </details>
 
 <details open>
 <summary><b>8. Bug Fixes</b></summary>
 
-- [ ] DD-8941 — QEnergyUSA Regular Search Broken
-- [ ] DD-8936 — Batch download for multiple emails error
-- [ ] DD-8928 — Email Ingestion Error — 522: Connection timed out
+- [ ] [DD-8941](https://archeiojira.atlassian.net/browse/DD-8941) — QEnergyUSA Regular Search Broken
+- [ ] [DD-8936](https://archeiojira.atlassian.net/browse/DD-8936) — Batch download for multiple emails error
+- [ ] [DD-8928](https://archeiojira.atlassian.net/browse/DD-8928) — Email Ingestion Error — 522: Connection timed out
 
 </details>
 
