@@ -136,21 +136,26 @@ assignees: ""
 <details>
 <summary><b>7. New Features</b></summary>
 
-- [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
-- [ ] DD-8779 — [Import][FE] Performance: Status doesn't update in large number of files
-- [ ] DD-8743 — [Export][BE] Include metadata in email notifications
-- [ ] DD-8957 — Adjust Confidence Restriction to allow re-processing of any document
-- [ ] DD-8710 — [Import][FE] Ability to Retrieve Job Summary on Older Imports
-- [ ] DD-8602 — [NewImport] Exploration Detail Log shows only counts for files in root path
+- [ ] DD-8991 — [Export][CredMgmt][FE] UI to manage user Credentials
+- [ ] DD-8979 — [Export][CredMgmt] Design/Create services in API
+- [ ] DD-8978 — [Export][CredMgmt] Create data persistence objects in DD Database
+- [ ] DD-8973 — Implementing Auto-Response for Non-Existent Email Ingestion Addresses
+- [ ] DD-8961 — QAI Support — Add Link to QAI Support to Footer
+- [ ] DD-8956 — Background Excel Export for Search Results (>10K rows)
+- [ ] DD-8955 — Search API: Add streaming export endpoint for bulk Excel export (500K+ docs)
+- [ ] DD-8954 — Search API: Fix deep pagination to support search results beyond 10K
+- [ ] DD-8920 — [BE] OCR Confidence Search tech setup
+- [ ] DD-7895 — [FE] OCR Confidence — Search Criteria and Results in UI
 
 </details>
 
 <details>
 <summary><b>8. Bug Fixes</b></summary>
 
-- [ ] DD-8941 — QEnergyUSA Regular Search Broken
-- [ ] DD-8936 — Batch download for multiple emails error
-- [ ] DD-8928 — Email Ingestion Error — 522: Connection timed out
+- [ ] DD-8965 — Import jobs remain stuck in "In Progress" in test environment
+- [ ] DD-8964 — Search Results page goes blank after editing document attributes
+- [ ] DD-8963 — Success notification shows error after deleting projects
+- [ ] DD-8958 — Email Ingestion Errors for Large Number of Attachments — No Error Message
 
 </details>
 
@@ -262,21 +267,26 @@ assignees: ""
 <details>
 <summary><b>7. New Features</b></summary>
 
-- [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
-- [ ] DD-8779 — [Import][FE] Performance: Status doesn't update in large number of files
-- [ ] DD-8743 — [Export][BE] Include metadata in email notifications
-- [ ] DD-8957 — Adjust Confidence Restriction to allow re-processing of any document
-- [ ] DD-8710 — [Import][FE] Ability to Retrieve Job Summary on Older Imports
-- [ ] DD-8602 — [NewImport] Exploration Detail Log shows only counts for files in root path
+- [ ] DD-8991 — [Export][CredMgmt][FE] UI to manage user Credentials
+- [ ] DD-8979 — [Export][CredMgmt] Design/Create services in API
+- [ ] DD-8978 — [Export][CredMgmt] Create data persistence objects in DD Database
+- [ ] DD-8973 — Implementing Auto-Response for Non-Existent Email Ingestion Addresses
+- [ ] DD-8961 — QAI Support — Add Link to QAI Support to Footer
+- [ ] DD-8956 — Background Excel Export for Search Results (>10K rows)
+- [ ] DD-8955 — Search API: Add streaming export endpoint for bulk Excel export (500K+ docs)
+- [ ] DD-8954 — Search API: Fix deep pagination to support search results beyond 10K
+- [ ] DD-8920 — [BE] OCR Confidence Search tech setup
+- [ ] DD-7895 — [FE] OCR Confidence — Search Criteria and Results in UI
 
 </details>
 
 <details>
 <summary><b>8. Bug Fixes</b></summary>
 
-- [ ] DD-8941 — QEnergyUSA Regular Search Broken
-- [ ] DD-8936 — Batch download for multiple emails error
-- [ ] DD-8928 — Email Ingestion Error — 522: Connection timed out
+- [ ] DD-8965 — Import jobs remain stuck in "In Progress" in test environment
+- [ ] DD-8964 — Search Results page goes blank after editing document attributes
+- [ ] DD-8963 — Success notification shows error after deleting projects
+- [ ] DD-8958 — Email Ingestion Errors for Large Number of Attachments — No Error Message
 
 </details>
 
@@ -388,21 +398,26 @@ assignees: ""
 <details>
 <summary><b>7. New Features</b></summary>
 
-- [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
-- [ ] DD-8779 — [Import][FE] Performance: Status doesn't update in large number of files
-- [ ] DD-8743 — [Export][BE] Include metadata in email notifications
-- [ ] DD-8957 — Adjust Confidence Restriction to allow re-processing of any document
-- [ ] DD-8710 — [Import][FE] Ability to Retrieve Job Summary on Older Imports
-- [ ] DD-8602 — [NewImport] Exploration Detail Log shows only counts for files in root path
+- [ ] DD-8991 — [Export][CredMgmt][FE] UI to manage user Credentials
+- [ ] DD-8979 — [Export][CredMgmt] Design/Create services in API
+- [ ] DD-8978 — [Export][CredMgmt] Create data persistence objects in DD Database
+- [ ] DD-8973 — Implementing Auto-Response for Non-Existent Email Ingestion Addresses
+- [ ] DD-8961 — QAI Support — Add Link to QAI Support to Footer
+- [ ] DD-8956 — Background Excel Export for Search Results (>10K rows)
+- [ ] DD-8955 — Search API: Add streaming export endpoint for bulk Excel export (500K+ docs)
+- [ ] DD-8954 — Search API: Fix deep pagination to support search results beyond 10K
+- [ ] DD-8920 — [BE] OCR Confidence Search tech setup
+- [ ] DD-7895 — [FE] OCR Confidence — Search Criteria and Results in UI
 
 </details>
 
 <details>
 <summary><b>8. Bug Fixes</b></summary>
 
-- [ ] DD-8941 — QEnergyUSA Regular Search Broken
-- [ ] DD-8936 — Batch download for multiple emails error
-- [ ] DD-8928 — Email Ingestion Error — 522: Connection timed out
+- [ ] DD-8965 — Import jobs remain stuck in "In Progress" in test environment
+- [ ] DD-8964 — Search Results page goes blank after editing document attributes
+- [ ] DD-8963 — Success notification shows error after deleting projects
+- [ ] DD-8958 — Email Ingestion Errors for Large Number of Attachments — No Error Message
 
 </details>
 
