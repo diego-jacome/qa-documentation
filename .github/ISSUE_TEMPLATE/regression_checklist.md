@@ -32,7 +32,7 @@ assignees: ""
 
 ## 🔵 QA
 
-<details>
+<details open>
 <summary><b>1. Login</b></summary>
 
 - [ ] Login credentials
@@ -41,7 +41,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>2. System Admin</b></summary>
 
 - [ ] Import via S3 big import: cancel before start
@@ -56,7 +56,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>3. Client Admin</b></summary>
 
 - [ ] Notifications
@@ -79,7 +79,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>4. Document Management</b></summary>
 
 - [ ] Keyword search
@@ -106,7 +106,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>5. End User</b></summary>
 
 - [ ] Home page: transition to Document
@@ -116,7 +116,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>6. On Demand Importer</b></summary>
 
 - [ ] Update Document Attributes
@@ -133,7 +133,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>7. New Features</b></summary>
 
 - [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
@@ -145,7 +145,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>8. Bug Fixes</b></summary>
 
 - [ ] DD-8941 — QEnergyUSA Regular Search Broken
@@ -158,7 +158,7 @@ assignees: ""
 
 ## 🟡 Staging
 
-<details>
+<details open>
 <summary><b>1. Login</b></summary>
 
 - [ ] Login credentials
@@ -167,7 +167,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>2. System Admin</b></summary>
 
 - [ ] Import via S3 big import: cancel before start
@@ -182,7 +182,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>3. Client Admin</b></summary>
 
 - [ ] Notifications
@@ -205,7 +205,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>4. Document Management</b></summary>
 
 - [ ] Keyword search
@@ -232,7 +232,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>5. End User</b></summary>
 
 - [ ] Home page: transition to Document
@@ -242,7 +242,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>6. On Demand Importer</b></summary>
 
 - [ ] Update Document Attributes
@@ -259,7 +259,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>7. New Features</b></summary>
 
 - [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
@@ -271,7 +271,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>8. Bug Fixes</b></summary>
 
 - [ ] DD-8941 — QEnergyUSA Regular Search Broken
@@ -284,7 +284,7 @@ assignees: ""
 
 ## 🟢 Production
 
-<details>
+<details open>
 <summary><b>1. Login</b></summary>
 
 - [ ] Login credentials
@@ -293,7 +293,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>2. System Admin</b></summary>
 
 - [ ] Import via S3 big import: cancel before start
@@ -308,7 +308,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>3. Client Admin</b></summary>
 
 - [ ] Notifications
@@ -331,7 +331,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>4. Document Management</b></summary>
 
 - [ ] Keyword search
@@ -358,7 +358,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>5. End User</b></summary>
 
 - [ ] Home page: transition to Document
@@ -368,7 +368,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>6. On Demand Importer</b></summary>
 
 - [ ] Update Document Attributes
@@ -385,7 +385,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>7. New Features</b></summary>
 
 - [ ] DD-8944 — Migrate DD Apps from HTTP Email Endpoint to Azure Service Bus
@@ -397,7 +397,7 @@ assignees: ""
 
 </details>
 
-<details>
+<details open>
 <summary><b>8. Bug Fixes</b></summary>
 
 - [ ] DD-8941 — QEnergyUSA Regular Search Broken
