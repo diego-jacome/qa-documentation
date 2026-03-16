@@ -26,11 +26,11 @@ assignees: ""
 | ⚠️ | Blocked |
 | ⏭️ | Skipped / N/A |
 
-> Mark each item as done clicking the checkbox. Add a comment below for fails/blocks.
+> Mark each item as done clicking the checkbox. Add a comment below for fails/blocks. Algo cambió?
 
 ---
 
-## � QA
+## 🟢 QA
 
 <details>
 <summary><b>1. Login</b></summary>
