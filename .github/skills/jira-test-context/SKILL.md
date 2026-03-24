@@ -30,12 +30,20 @@ El script está en `scripts/jira/` y retorna:
 - Comentarios
 - Sub-tareas y tickets vinculados
 
-### Paso 2 — Solicitar capturas de pantalla
-Indicar al usuario:
+### Paso 2 — Leer adjuntos descargados automáticamente
+El script descarga los adjuntos del ticket automáticamente en:
 
-> "Si tienes capturas de pantalla del ticket, puedes encontrarlas en `attachments/<TICKET-ID>/` o adjuntarlas directamente al chat para que las analice."
+```
+scripts/jira/attachments/<TICKET-ID>/
+```
 
-Las imágenes se guardan con el patrón: `attachments/<TICKET-ID>/image-YYYYMMDD-HHMMSS.png`
+**SIEMPRE** ejecutar estos pasos después de obtener los datos del ticket:
+
+1. Listar el contenido de `scripts/jira/attachments/<TICKET-ID>/` para ver qué archivos fueron descargados.
+2. Para cada archivo de imagen (`.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`) encontrado, usar la herramienta `view_image` para verla y analizarla.
+3. Incluir el análisis visual en el resumen de contexto.
+
+Si la carpeta no existe o está vacía, indicar al usuario que puede adjuntar imágenes directamente al chat.
 
 ### Paso 3 — Generar el resumen de contexto
 Con los datos del script (y las imágenes si el usuario las adjunta), producir un resumen con esta estructura:
