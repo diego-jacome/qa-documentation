@@ -1,0 +1,24 @@
+{
+    "info": {
+        "name": "tmp_request",
+        "_postman_id": "tmp-request-001",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "GET /documents/656438/download",
+            "request": {
+                "method": "GET",
+                "header": [
+                    { "key": "quti", "value": "1000000000000123" },
+                    { "key": "Ocp-Apim-Subscription-Key", "value": "{{apiKey}}" }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/documents/656438/download",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["documents", "656438", "download"]
+                }
+            }
+        }
+    ]
+}

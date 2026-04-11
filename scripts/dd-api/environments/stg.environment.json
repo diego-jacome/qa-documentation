@@ -1,0 +1,17 @@
+{
+    "id": "dd-api-stg",
+    "name": "DD API - Staging",
+    "values": [
+        {
+            "key": "baseUrl",
+            "value": "https://apim-api-management-stg.azure-api.net/documents/v1",
+            "enabled": true
+        },
+        {
+            "key": "apiKey",
+            "value": "906362991def40fb94193eaf725dac33",
+            "enabled": true
+        }
+    ],
+    "_postman_variable_scope": "environment"
+}
