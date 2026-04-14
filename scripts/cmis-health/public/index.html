@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMIS API Health Dashboard</title>
+  <style>
+    :root {
+      --primary:    #1a5276;
+      --primary-dk: #0e2d42;
+      --primary-lt: #d6eaf8;
+      --bg:         #f4f6f8;
+      --card-bg:    #ffffff;
+      --border:     #d1d9e0;
+      --text:       #1a202c;
+      --text-sec:   #5a6a7e;
+      --radius:     8px;
+      --shadow:     0 1px 8px rgba(0,0,0,.09);
+
+      --c-ok:       #16a34a;
+      --c-ok-bg:    #dcfce7;
+      --c-ok-bdr:   #bbf7d0;
+      --c-reach:    #0284c7;
+      --c-reach-bg: #e0f2fe;
+      --c-reach-bdr:#bae6fd;
+      --c-err:      #dc2626;
+      --c-err-bg:   #fee2e2;
+      --c-err-bdr:  #fecaca;
+      --c-idle:     #94a3b8;
+      --c-idle-bg:  #f1f5f9;
+      --c-idle-bdr: #e2e8f0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+           background: var(--bg); color: var(--text); min-height: 100vh; }
+    button { cursor: pointer; border: none; background: none; font: inherit; }
+    select, input { font: inherit; }
+
+    /* ── Header ──────────────────────────────────────────────── */
+    .header {
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    .header h1 { font-size: 1.15rem; font-weight: 600; }
+    .header .subtitle { font-size: .8rem; opacity: .75; margin-left: auto; }
+
+    /* ── Layout ──────────────────────────────────────────────── */
+    .main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+    /* ── Config Card ─────────────────────────────────────────── */
+    .config-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .config-card h2 { font-size: .95rem; font-weight: 600; margin-bottom: 16px; color: var(--primary-dk); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .form-field label { display: block; font-size: .78rem; font-weight: 500; color: var(--text-sec); margin-bottom: 4px; }
+    .form-field input, .form-field select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: .88rem;
+      background: #fff;
+    }
+    .form-field input:focus, .form-field select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,82,118,.12);
+    }
+
+    /* Tenant selector */
+    .tenant-wrap { position: relative; }
+    .tenant-search {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px 6px 0 0;
+      font-size: .88rem;
+      border-bottom: none;
+      background: #fff;
+    }
+    .tenant-search:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,82,118,.12); }
+    .tenant-select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 0 0 6px 6px;
+      font-size: .85rem;
+      background: #fff;
+    }
+    .tenant-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,82,118,.12); }
+    .tenant-info { font-size: .72rem; color: var(--text-sec); margin-top: 3px; }
+
+    .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: .88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: .15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dk); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:hover { background: #c4cdd7; }
+
+    .status-bar { font-size: .82rem; color: var(--text-sec); }
+
+    /* ── Summary row ─────────────────────────────────────────── */
+    .summary {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .summary-pill {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: .82rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .pill-ok     { background: var(--c-ok-bg);    color: var(--c-ok);    border-color: var(--c-ok-bdr);    }
+    .pill-reach  { background: var(--c-reach-bg); color: var(--c-reach); border-color: var(--c-reach-bdr); }
+    .pill-err    { background: var(--c-err-bg);   color: var(--c-err);   border-color: var(--c-err-bdr);   }
+    .pill-idle   { background: var(--c-idle-bg);  color: var(--c-idle);  border-color: var(--c-idle-bdr);  }
+
+    /* ── Results ─────────────────────────────────────────────── */
+    .tag-section { margin-bottom: 20px; }
+    .tag-title {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-sec);
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 8px;
+    }
+
+    .check-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: box-shadow .15s;
+    }
+    .check-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.13); }
+
+    .check-card.status-ok     { border-left: 4px solid var(--c-ok);    }
+    .check-card.status-reachable { border-left: 4px solid var(--c-reach); }
+    .check-card.status-error  { border-left: 4px solid var(--c-err);   }
+    .check-card.status-idle   { border-left: 4px solid var(--c-idle);  }
+
+    .check-header { display: flex; align-items: center; gap: 8px; }
+    .method-badge {
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      min-width: 52px;
+      text-align: center;
+    }
+    .m-GET    { background: #dbeafe; color: #1d4ed8; }
+    .m-POST   { background: #dcfce7; color: #15803d; }
+    .m-PUT    { background: #fef9c3; color: #92400e; }
+    .m-DELETE { background: #fee2e2; color: #991b1b; }
+
+    .check-label { font-size: .88rem; font-weight: 500; flex: 1; }
+    .status-badge {
+      font-size: .75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .badge-ok      { background: var(--c-ok-bg);    color: var(--c-ok);    }
+    .badge-reachable { background: var(--c-reach-bg); color: var(--c-reach); }
+    .badge-error   { background: var(--c-err-bg);   color: var(--c-err);   }
+    .badge-idle    { background: var(--c-idle-bg);  color: var(--c-idle);  }
+
+    .check-meta { font-size: .75rem; color: var(--text-sec); display: flex; gap: 10px; align-items: center; }
+    .check-path { font-size: .72rem; color: var(--text-sec); font-family: monospace; word-break: break-all; }
+
+    /* ── Detail Drawer ───────────────────────────────────────── */
+    .drawer-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.35);
+      z-index: 100;
+    }
+    .drawer-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+    .drawer {
+      background: var(--card-bg);
+      border-radius: var(--radius) var(--radius) 0 0;
+      width: 100%;
+      max-width: 700px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+    .drawer h3 { font-size: 1rem; margin-bottom: 16px; }
+    .drawer-close {
+      position: absolute; top: 14px; right: 16px;
+      font-size: 1.3rem; color: var(--text-sec); cursor: pointer;
+      background: none; border: none; line-height: 1;
+    }
+
+    .detail-row { margin-bottom: 12px; }
+    .detail-row label { font-size: .75rem; font-weight: 600; color: var(--text-sec); display: block; margin-bottom: 3px; }
+    .detail-row pre {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: .78rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .detail-row input {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: .85rem;
+      font-family: monospace;
+    }
+
+    .run-btn-row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+    .run-result { margin-top: 14px; }
+    .run-result label { font-size: .75rem; font-weight: 600; color: var(--text-sec); }
+    .run-result pre { margin-top: 4px; }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid #ccc;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+  <h1>CMIS API Health Dashboard</h1>
+  <span class="subtitle">DynamicDocs · AtomPub 1.1</span>
+</div>
+
+<div class="main">
+
+  <!-- Config Card -->
+  <div class="config-card">
+    <h2>Configuracion</h2>
+    <div class="form-grid">
+      <div class="form-field">
+        <label for="sel-env">Ambiente</label>
+        <select id="sel-env"></select>
+      </div>
+      <div class="form-field" style="min-width:280px">
+        <label>Tenant (Repository ID = SystemID)</label>
+        <div class="tenant-wrap">
+          <input type="text" class="tenant-search" id="tenant-search" placeholder="Buscar tenant..." autocomplete="off" />
+          <select id="sel-tenant" class="tenant-select"></select>
+        </div>
+        <div class="tenant-info" id="tenant-info">Selecciona un tenant</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-run-all">Ejecutar todos los checks</button>
+      <button class="btn btn-secondary" id="btn-clear" style="display:none">Limpiar resultados</button>
+      <span class="status-bar" id="status-bar"></span>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary hidden" id="summary-row"></div>
+
+  <!-- Results -->
+  <div id="results-container"></div>
+
+</div>
+
+<!-- Drawer -->
+<div class="drawer-overlay" id="drawer-overlay">
+  <div class="drawer" id="drawer">
+    <button class="drawer-close" id="drawer-close">&#10005;</button>
+    <h3 id="drawer-title">Detalle del endpoint</h3>
+    <div id="drawer-body"></div>
+  </div>
+</div>
+
+<script>
+  let CONFIG = {};
+  let lastResults = null;
+  let currentCheckId = null;
+  let allTenants = [];  // tenants del ambiente actual
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+
+  async function init() {
+    const resp = await fetch('/api/config');
+    CONFIG = await resp.json();
+
+    const sel = document.getElementById('sel-env');
+    CONFIG.environments.forEach(e => {
+      const opt = new Option(e.label + (e.enabled ? '' : ' (sin URL)'), e.key);
+      opt.disabled = !e.enabled;
+      sel.appendChild(opt);
+    });
+    sel.value = 'qa';
+    populateTenants('qa');
+
+    sel.addEventListener('change', () => populateTenants(sel.value));
+
+    document.getElementById('tenant-search').addEventListener('input', () => {
+      filterTenants(document.getElementById('tenant-search').value);
+    });
+    document.getElementById('sel-tenant').addEventListener('change', updateTenantInfo);
+  }
+
+  function populateTenants(env) {
+    allTenants = (CONFIG.tenants && CONFIG.tenants[env]) || [];
+    filterTenants('');
+    document.getElementById('tenant-search').value = '';
+    document.getElementById('tenant-info').textContent =
+      allTenants.length ? `${allTenants.length} tenants disponibles` : 'Sin tenants para este ambiente';
+  }
+
+  function filterTenants(query) {
+    const sel = document.getElementById('sel-tenant');
+    const q = query.toLowerCase();
+    sel.innerHTML = '';
+    const filtered = allTenants.filter(t =>
+      !q || t.client.toLowerCase().includes(q) || String(t.systemId).includes(q)
+    );
+    // Add empty first option so user can choose explicitly
+    sel.appendChild(new Option('— Selecciona un tenant —', ''));
+    filtered.forEach(t => {
+      const opt = new Option(`${t.client}  (${t.systemId})`, t.systemId);
+      sel.appendChild(opt);
+    });
+    updateTenantInfo();
+  }
+
+  function updateTenantInfo() {
+    const sel = document.getElementById('sel-tenant');
+    const systemId = sel.value;
+    const t = allTenants.find(x => String(x.systemId) === String(systemId));
+    document.getElementById('tenant-info').textContent =
+      t ? `SystemID: ${t.systemId}` : 'Selecciona un tenant';
+  }
+
+  function getSelectedRepoId() {
+    return document.getElementById('sel-tenant').value || '';
+  }
+
+  // ── Run all checks ────────────────────────────────────────────────────────
+
+  document.getElementById('btn-run-all').addEventListener('click', async () => {
+    const env    = document.getElementById('sel-env').value;
+    const repoId = getSelectedRepoId();
+
+    if (!repoId) {
+      setStatus('Selecciona un tenant antes de ejecutar.', 'red');
+      return;
+    }
+
+    const btn = document.getElementById('btn-run-all');
+    btn.disabled = true;
+    setStatus('<span class="spinner"></span> Ejecutando checks...', '');
+
+    document.getElementById('summary-row').classList.add('hidden');
+    document.getElementById('results-container').innerHTML = '';
+
+    const resp = await fetch('/api/health', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ env, repositoryId: repoId }),
+    });
+    const data = await resp.json();
+    btn.disabled = false;
+
+    if (!resp.ok) {
+      setStatus('Error: ' + (data.error || resp.statusText), 'red');
+      return;
+    }
+
+    lastResults = data;
+    renderResults(data);
+    setStatus(`Completado a las ${new Date(data.checkedAt).toLocaleTimeString()} · ${data.results.length} checks`, '');
+    document.getElementById('btn-clear').style.display = '';
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    document.getElementById('results-container').innerHTML = '';
+    document.getElementById('summary-row').classList.add('hidden');
+    document.getElementById('btn-clear').style.display = 'none';
+    setStatus('', '');
+    lastResults = null;
+  });
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  function renderResults(data) {
+    const container = document.getElementById('results-container');
+    container.innerHTML = '';
+
+    // Summary
+    const counts = { ok: 0, reachable: 0, error: 0 };
+    data.results.forEach(r => {
+      if (r.status_label === 'ok')        counts.ok++;
+      else if (r.status_label === 'reachable') counts.reachable++;
+      else counts.error++;
+    });
+    const sumRow = document.getElementById('summary-row');
+    sumRow.classList.remove('hidden');
+    sumRow.innerHTML = `
+      <span class="summary-pill pill-ok">OK: ${counts.ok}</span>
+      <span class="summary-pill pill-reach">Reachable: ${counts.reachable}</span>
+      <span class="summary-pill pill-err">Error: ${counts.error}</span>
+      <span class="summary-pill pill-idle">Total: ${data.results.length}</span>
+    `;
+
+    // Group by tag
+    const tags = {};
+    data.results.forEach(r => {
+      if (!tags[r.tag]) tags[r.tag] = [];
+      tags[r.tag].push(r);
+    });
+
+    for (const [tag, items] of Object.entries(tags)) {
+      const section = document.createElement('div');
+      section.className = 'tag-section';
+      section.innerHTML = `<div class="tag-title">${tag}</div><div class="results-grid" id="grid-${tag}"></div>`;
+      container.appendChild(section);
+
+      const grid = section.querySelector('.results-grid');
+      items.forEach(r => {
+        const card = document.createElement('div');
+        card.className = `check-card status-${r.status_label}`;
+        card.innerHTML = `
+          <div class="check-header">
+            <span class="method-badge m-${r.method}">${r.method}</span>
+            <span class="check-label">${r.label}</span>
+            <span class="status-badge badge-${r.status_label}">${badgeText(r)}</span>
+          </div>
+          <div class="check-meta">
+            <span>${r.ms}ms</span>
+            ${r.probe ? '<span style="opacity:.6">(probe)</span>' : ''}
+            ${r.error ? `<span style="color:var(--c-err)">${r.error}</span>` : ''}
+          </div>
+          <div class="check-path">${r.path}</div>
+        `;
+        card.addEventListener('click', () => openDrawer(r));
+        grid.appendChild(card);
+      });
+    }
+  }
+
+  function badgeText(r) {
+    if (r.status_label === 'reachable') return `${r.status} Reachable`;
+    if (r.status === 0) return r.error ? 'Error' : '—';
+    return r.status;
+  }
+
+  // ── Drawer ────────────────────────────────────────────────────────────────
+
+  function openDrawer(result) {
+    currentCheckId = result.id;
+    const overlay = document.getElementById('drawer-overlay');
+    document.getElementById('drawer-title').textContent = result.label;
+
+    document.getElementById('drawer-body').innerHTML = `
+      <div class="detail-row">
+        <label>Metodo · Path</label>
+        <pre>${result.method} ${result.path}</pre>
+      </div>
+      <div class="detail-row">
+        <label>Status · Tiempo</label>
+        <pre>${result.status || '—'} · ${result.ms}ms</pre>
+      </div>
+      ${result.error ? `<div class="detail-row"><label>Error</label><pre>${result.error}</pre></div>` : ''}
+      ${result.body_snippet ? `<div class="detail-row"><label>Response (snippet)</label><pre>${escapeHtml(result.body_snippet)}</pre></div>` : ''}
+      <hr style="margin:16px 0;border:none;border-top:1px solid var(--border)">
+      <div class="detail-row">
+        <label>Parametros adicionales (query string, ej: id=abc123)</label>
+        <input type="text" id="inp-extra-params" placeholder="id=abc123&filter=cmis:name" />
+      </div>
+      <div class="run-btn-row">
+        <button class="btn btn-primary" id="btn-run-single">Ejecutar este endpoint</button>
+        <span id="run-single-status"></span>
+      </div>
+      <div class="run-result hidden" id="run-result-box">
+        <label>Resultado</label>
+        <pre id="run-result-pre"></pre>
+      </div>
+    `;
+
+    document.getElementById('btn-run-single').addEventListener('click', runSingle);
+    overlay.classList.add('open');
+  }
+
+  async function runSingle() {
+    const env    = document.getElementById('sel-env').value;
+    const repoId = getSelectedRepoId();
+    const extra  = document.getElementById('inp-extra-params').value.trim();
+
+    const btn = document.getElementById('btn-run-single');
+    btn.disabled = true;
+    document.getElementById('run-single-status').innerHTML = '<span class="spinner"></span>';
+
+    // Parse extra params
+    const customParams = {};
+    if (extra) {
+      extra.split('&').forEach(pair => {
+        const [k, v] = pair.split('=');
+        if (k) customParams[k.trim()] = v ? v.trim() : '';
+      });
+    }
+
+    const resp = await fetch('/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ env, repositoryId: repoId, checkId: currentCheckId, customParams }),
+    });
+    const data = await resp.json();
+
+    btn.disabled = false;
+    document.getElementById('run-single-status').innerHTML = '';
+
+    const box = document.getElementById('run-result-box');
+    const pre = document.getElementById('run-result-pre');
+    box.classList.remove('hidden');
+    pre.textContent = JSON.stringify(data, null, 2);
+  }
+
+  document.getElementById('drawer-close').addEventListener('click', () => {
+    document.getElementById('drawer-overlay').classList.remove('open');
+  });
+  document.getElementById('drawer-overlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('drawer-overlay'))
+      document.getElementById('drawer-overlay').classList.remove('open');
+  });
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  function setStatus(msg, color) {
+    const el = document.getElementById('status-bar');
+    el.innerHTML = msg;
+    el.style.color = color || '';
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  init();
+</script>
+</body>
+</html>

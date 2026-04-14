@@ -1,0 +1,1407 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "DynamicDocs CMIS API",
+    "description": "Contains AtomPub and Browser binding to work with CMIS",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/version": {
+      "get": {
+        "tags": [
+          "ApiVersion"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/children": {
+      "get": {
+        "tags": [
+          "NavigationAtom"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Get/Set OrderBy",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includePathSegment",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "maxItems",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "skipCount",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "includeRelationships",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/IncludeRelationships"
+            }
+          },
+          {
+            "name": "includeAllowableActions",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includePolicyIds",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeACL",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Get/Set Filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "renditionFilter",
+            "in": "query",
+            "description": "Get/Set RenditionFilter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "versioningState",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/VersioningState"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/atom+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/parent": {
+      "get": {
+        "tags": [
+          "NavigationAtom"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeRelationships",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/IncludeRelationships"
+            }
+          },
+          {
+            "name": "includeAllowableActions",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includePolicyIds",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeACL",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Get/Set Filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "renditionFilter",
+            "in": "query",
+            "description": "Get/Set RenditionFilter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/parents": {
+      "get": {
+        "tags": [
+          "NavigationAtom"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "objectId",
+            "in": "query",
+            "description": "Get/Set ObjectId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folderId",
+            "in": "query",
+            "description": "Get/Set FolderId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "OrderBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeRelativePathSegment",
+            "in": "query",
+            "description": "Get/Set IncludeRelativePathSegment",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeRelationships",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/IncludeRelationships"
+            }
+          },
+          {
+            "name": "includeAllowableActions",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includePolicyIds",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeACL",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Get/Set Filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "renditionFilter",
+            "in": "query",
+            "description": "Get/Set RenditionFilter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/id": {
+      "get": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "returnVersion",
+            "in": "query",
+            "description": "Get/Set ReturnVersion",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeRelationships",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/IncludeRelationships"
+            }
+          },
+          {
+            "name": "includeAllowableActions",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includePolicyIds",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeACL",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Get/Set Filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "renditionFilter",
+            "in": "query",
+            "description": "Get/Set RenditionFilter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/atom+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/path": {
+      "get": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeRelationships",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/IncludeRelationships"
+            }
+          },
+          {
+            "name": "includeAllowableActions",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includePolicyIds",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeACL",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Get/Set Filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "renditionFilter",
+            "in": "query",
+            "description": "Get/Set RenditionFilter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/unfiled": {
+      "post": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "removeFrom",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/atom+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/acl": {
+      "get": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/relationships": {
+      "get": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/update": {
+      "post": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/atom+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/XDocument"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/descendants": {
+      "delete": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/content": {
+      "get": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "summary": "Gets the content stream for the specified document object, or gets a rendition stream for a specified rendition of a document or folder object.",
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "description": "The identifier for the repository.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Id of object to be retrieved",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "streamId",
+            "in": "query",
+            "description": "Id of streamId to be processed",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "changeToken",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "overwriteFlag",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/allowableactions": {
+      "get": {
+        "tags": [
+          "ObjectAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom": {
+      "get": {
+        "tags": [
+          "RepositoryAtomPub"
+        ],
+        "summary": "Gets the repository info for a specific CMIS repository.",
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "query",
+            "description": "The identifier for the repository.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/type": {
+      "get": {
+        "tags": [
+          "RepositoryAtomPub"
+        ],
+        "summary": "Gets type definition.",
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "description": "The identifier for the repository.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Type id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/types": {
+      "get": {
+        "tags": [
+          "RepositoryAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "typeId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includePropertyDefinitions",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "maxItems",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "skipCount",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/cmis/version/1.1/atom/{repositoryId}/typedesc": {
+      "get": {
+        "tags": [
+          "RepositoryAtomPub"
+        ],
+        "parameters": [
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "typeId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includePropertyDefinitions",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IncludeRelationships": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "VersioningState": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "XAttribute": {
+        "type": "object",
+        "properties": {
+          "baseUri": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "document": {
+            "$ref": "#/components/schemas/XDocument"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/XElement"
+          },
+          "isNamespaceDeclaration": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "name": {
+            "$ref": "#/components/schemas/XName"
+          },
+          "nextAttribute": {
+            "$ref": "#/components/schemas/XAttribute"
+          },
+          "nodeType": {
+            "$ref": "#/components/schemas/XmlNodeType"
+          },
+          "previousAttribute": {
+            "$ref": "#/components/schemas/XAttribute"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "XDeclaration": {
+        "type": "object",
+        "properties": {
+          "encoding": {
+            "type": "string",
+            "nullable": true
+          },
+          "standalone": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "XDocument": {
+        "type": "object",
+        "properties": {
+          "baseUri": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "document": {
+            "$ref": "#/components/schemas/XDocument"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/XElement"
+          },
+          "nextNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "previousNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "firstNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "lastNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "declaration": {
+            "$ref": "#/components/schemas/XDeclaration"
+          },
+          "documentType": {
+            "$ref": "#/components/schemas/XDocumentType"
+          },
+          "nodeType": {
+            "$ref": "#/components/schemas/XmlNodeType"
+          },
+          "root": {
+            "$ref": "#/components/schemas/XElement"
+          }
+        },
+        "additionalProperties": false
+      },
+      "XDocumentType": {
+        "type": "object",
+        "properties": {
+          "baseUri": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "document": {
+            "$ref": "#/components/schemas/XDocument"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/XElement"
+          },
+          "nextNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "previousNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "internalSubset": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "nodeType": {
+            "$ref": "#/components/schemas/XmlNodeType"
+          },
+          "publicId": {
+            "type": "string",
+            "nullable": true
+          },
+          "systemId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "XElement": {
+        "type": "object",
+        "properties": {
+          "baseUri": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "document": {
+            "$ref": "#/components/schemas/XDocument"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/XElement"
+          },
+          "nextNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "previousNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "firstNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "lastNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "firstAttribute": {
+            "$ref": "#/components/schemas/XAttribute"
+          },
+          "hasAttributes": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasElements": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isEmpty": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "lastAttribute": {
+            "$ref": "#/components/schemas/XAttribute"
+          },
+          "name": {
+            "$ref": "#/components/schemas/XName"
+          },
+          "nodeType": {
+            "$ref": "#/components/schemas/XmlNodeType"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "XName": {
+        "type": "object",
+        "properties": {
+          "localName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "namespace": {
+            "$ref": "#/components/schemas/XNamespace"
+          },
+          "namespaceName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "XNamespace": {
+        "type": "object",
+        "properties": {
+          "namespaceName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "XNode": {
+        "type": "object",
+        "properties": {
+          "baseUri": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "document": {
+            "$ref": "#/components/schemas/XDocument"
+          },
+          "nodeType": {
+            "$ref": "#/components/schemas/XmlNodeType"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/XElement"
+          },
+          "nextNode": {
+            "$ref": "#/components/schemas/XNode"
+          },
+          "previousNode": {
+            "$ref": "#/components/schemas/XNode"
+          }
+        },
+        "additionalProperties": false
+      },
+      "XmlNodeType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "type": "integer",
+        "format": "int32"
+      }
+    }
+  }
+}

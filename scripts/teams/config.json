@@ -1,0 +1,43 @@
+{
+  "_comment": "Configuracion del monitor de Teams. Editar con tus datos reales tras hacer 'm365 login'.",
+
+  "poll_interval_seconds": 30,
+
+  "my_display_name": "Diego Jacome",
+
+  "importance_rules": {
+    "keywords": [
+      "urgent", "urgente", "blocker", "blocked", "critical",
+      "QA", "bug", "issue", "prod", "production", "down",
+      "error", "fail", "broken", "hotfix"
+    ],
+    "always_important_if_mentioned": true
+  },
+
+  "channels": [
+    {
+      "enabled": false,
+      "_comment": "Obtener IDs con: m365 teams team list --output json  y  m365 teams channel list --teamId <id> --output json",
+      "team_id": "REEMPLAZAR_CON_TEAM_ID",
+      "team_name": "Nombre del equipo (solo referencia)",
+      "channel_id": "REEMPLAZAR_CON_CHANNEL_ID",
+      "channel_name": "General"
+    }
+  ],
+
+  "chats": [
+    {
+      "enabled": false,
+      "_comment": "Obtener IDs con: m365 teams chat list --output json",
+      "chat_id": "REEMPLAZAR_CON_CHAT_ID",
+      "chat_name": "Nombre descriptivo (solo referencia)"
+    }
+  ],
+
+  "post_targets": {
+    "_comment": "Destino default cuando uses --post desde CLI",
+    "default_type": "channel",
+    "default_team_id": "REEMPLAZAR_CON_TEAM_ID",
+    "default_channel_id": "REEMPLAZAR_CON_CHANNEL_ID"
+  }
+}

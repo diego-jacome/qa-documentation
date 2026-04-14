@@ -1,6 +1,15 @@
 # Variables de entorno — NUNCA subir al repo
 .env
 
+# Token cache de Outlook/MSAL — contiene tokens de acceso personales
+token_cache.json
+
+# Adjuntos descargados de correos de Outlook
+scripts/outlook/attachments/
+
+# Newman environments — contienen API keys de QA/STG/PROD
+scripts/dd-api/environments/*.json
+
 # Adjuntos descargados de Jira (pueden ser archivos grandes o sensibles)
 attachments/
 

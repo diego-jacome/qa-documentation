@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DD API Health Dashboard</title>
+  <style>
+    /* ── Variables ─────────────────────────────────────────────── */
+    :root {
+      --primary:    #005f8e;
+      --primary-dk: #003d5c;
+      --primary-lt: #e0f2f9;
+      --bg:         #f4f6f8;
+      --card-bg:    #ffffff;
+      --border:     #d1d9e0;
+      --text:       #1a202c;
+      --text-sec:   #5a6a7e;
+      --radius:     8px;
+      --shadow:     0 1px 8px rgba(0,0,0,.09);
+      --transition: .15s ease;
+
+      --c-ok:       #16a34a;
+      --c-ok-bg:    #dcfce7;
+      --c-ok-bdr:   #bbf7d0;
+      --c-reach:    #0284c7;
+      --c-reach-bg: #e0f2fe;
+      --c-reach-bdr:#bae6fd;
+      --c-warn:     #ca8a04;
+      --c-warn-bg:  #fef9c3;
+      --c-warn-bdr: #fde68a;
+      --c-err:      #dc2626;
+      --c-err-bg:   #fee2e2;
+      --c-err-bdr:  #fecaca;
+      --c-idle:     #94a3b8;
+      --c-idle-bg:  #f1f5f9;
+      --c-idle-bdr: #e2e8f0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+           background: var(--bg); color: var(--text); min-height: 100vh; }
+    button { cursor: pointer; border: none; background: none; font: inherit; }
+    select, input { font: inherit; }
+    a { color: var(--primary); text-decoration: none; }
+
+    .hidden { display: none !important; }
+
+    /* ── Spinner ─────────────────────────────────────────────── */
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Navbar ─────────────────────────────────────────────────── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 54px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.22);
+    }
+    .nav-brand {
+      font-size: 1rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-brand svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .nav-meta { font-size: .75rem; opacity: .7; }
+
+    /* ── Main layout ─────────────────────────────────────────── */
+    .main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+    /* ── Config panel ────────────────────────────────────────── */
+    .config-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .config-panel h2 { font-size: .95rem; font-weight: 600; margin-bottom: 14px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .04em; }
+    .config-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+    .config-field { display: flex; flex-direction: column; gap: 4px; }
+    .config-field label { font-size: .8rem; font-weight: 600; color: var(--text-sec); }
+    .config-field select,
+    .config-field input {
+      padding: 7px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-size: .875rem;
+      min-width: 180px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .config-field select:focus,
+    .config-field input:focus { border-color: var(--primary); }
+    .config-field input.email-field { min-width: 240px; }
+
+    .btn-run {
+      padding: 8px 20px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 6px;
+      font-weight: 600; font-size: .875rem;
+      display: flex; align-items: center; gap: 8px;
+      transition: background var(--transition);
+      align-self: flex-end;
+    }
+    .btn-run:hover { background: var(--primary-dk); }
+    .btn-run:disabled { background: var(--c-idle); cursor: not-allowed; }
+    .btn-run .btn-spinner { width: 16px; height: 16px; border-width: 2px; }
+
+    /* ── Summary bar ─────────────────────────────────────────── */
+    #summary-bar {
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      margin-bottom: 20px;
+      font-size: .85rem;
+    }
+    .summary-stat {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px; font-weight: 600;
+    }
+    .summary-stat.ok   { background: var(--c-ok-bg);   color: var(--c-ok);   border: 1px solid var(--c-ok-bdr); }
+    .summary-stat.warn { background: var(--c-warn-bg);  color: var(--c-warn); border: 1px solid var(--c-warn-bdr); }
+    .summary-stat.err  { background: var(--c-err-bg);   color: var(--c-err);  border: 1px solid var(--c-err-bdr); }
+    .summary-stat .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+    .summary-meta { margin-left: auto; color: var(--text-sec); font-size: .8rem; }
+
+    /* ── Tags filter ─────────────────────────────────────────── */
+    #tag-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+    .tag-btn {
+      padding: 3px 11px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      font-size: .78rem; font-weight: 600;
+      color: var(--text-sec);
+      background: var(--card-bg);
+      transition: all var(--transition);
+    }
+    .tag-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .tag-btn.active { background: var(--primary-lt); border-color: var(--primary); color: var(--primary); }
+
+    /* ── Results grid ────────────────────────────────────────── */
+    #results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── Check card ──────────────────────────────────────────── */
+    .check-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--c-idle-bdr);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .check-card:hover { box-shadow: 0 2px 14px rgba(0,0,0,.13); }
+    .check-card.status-ok    { border-color: var(--c-ok-bdr);    }
+    .check-card.status-reach { border-color: var(--c-reach-bdr); }
+    .check-card.status-warn  { border-color: var(--c-warn-bdr);  }
+    .check-card.status-err   { border-color: var(--c-err-bdr);   }
+
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .card-label { font-size: .9rem; font-weight: 700; line-height: 1.3; }
+    .status-badge {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: .75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .status-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .status-badge.ok    { background: var(--c-ok-bg);    color: var(--c-ok); }
+    .status-badge.reach { background: var(--c-reach-bg);  color: var(--c-reach); }
+    .status-badge.warn  { background: var(--c-warn-bg);   color: var(--c-warn); }
+    .status-badge.err   { background: var(--c-err-bg);    color: var(--c-err); }
+    .status-badge.idle  { background: var(--c-idle-bg);   color: var(--c-idle); }
+
+    .card-meta {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      font-size: .8rem; color: var(--text-sec);
+    }
+
+    .method-badge {
+      padding: 2px 8px; border-radius: 4px;
+      font-size: .72rem; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .method-badge.GET    { background: #dbeafe; color: #1d4ed8; }
+    .method-badge.POST   { background: #dcfce7; color: #15803d; }
+    .method-badge.PUT    { background: #fef9c3; color: #a16207; }
+    .method-badge.PATCH  { background: #fce7f3; color: #9d174d; }
+    .method-badge.DELETE { background: #fee2e2; color: #b91c1c; }
+
+    .card-path {
+      font-family: monospace; font-size: .75rem;
+      color: var(--text-sec); word-break: break-all;
+    }
+
+    .card-stats { display: flex; gap: 14px; font-size: .82rem; }
+    .stat-item { display: flex; flex-direction: column; gap: 1px; }
+    .stat-label { font-size: .7rem; color: var(--text-sec); text-transform: uppercase; letter-spacing: .04em; }
+    .stat-value { font-weight: 700; font-size: .88rem; }
+    .stat-value.ok   { color: var(--c-ok); }
+    .stat-value.warn { color: var(--c-warn); }
+    .stat-value.err  { color: var(--c-err); }
+    .stat-value.idle { color: var(--c-idle); }
+
+    .card-error {
+      font-size: .78rem; color: var(--c-err);
+      background: var(--c-err-bg); padding: 6px 9px; border-radius: 5px;
+      word-break: break-all;
+    }
+
+    /* ── Pulse animation for running ──────────────────────────── */
+    .check-card.running { animation: pulseBorder 1s ease-in-out infinite; }
+    @keyframes pulseBorder {
+      0%,100% { border-color: var(--border); }
+      50%      { border-color: var(--primary); }
+    }
+
+    /* ── Empty state ─────────────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 60px 24px;
+      color: var(--text-sec); font-size: .9rem;
+      grid-column: 1 / -1;
+    }
+    .empty-state svg { display: block; margin: 0 auto 12px; opacity: .35; }
+
+    /* ── Error box ───────────────────────────────────────────── */
+    .error-box {
+      background: #fdecea; color: #c0392b;
+      border: 1px solid #f8c4c1;
+      border-radius: var(--radius);
+      padding: 12px 16px; font-size: .88rem;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+    DD API — Health Dashboard
+  </div>
+  <div class="nav-meta" id="nav-last-check"></div>
+</nav>
+
+<!-- ── Main ────────────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Config panel -->
+  <div class="config-panel">
+    <h2>Configuración</h2>
+    <div class="config-row">
+      <div class="config-field">
+        <label for="sel-env">Ambiente</label>
+        <select id="sel-env">
+          <option value="">Cargando...</option>
+        </select>
+      </div>
+      <div class="config-field">
+        <label for="sel-tenant">Tenant</label>
+        <select id="sel-tenant">
+          <option value="">— selecciona ambiente —</option>
+        </select>
+      </div>
+      <div class="config-field">
+        <label for="inp-email">Email</label>
+        <input id="inp-email" class="email-field" type="email"
+               placeholder="usuario@ejemplo.com" autocomplete="email" />
+      </div>
+      <button class="btn-run" id="btn-run" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Verificar salud
+      </button>
+    </div>
+  </div>
+
+  <!-- Error box -->
+  <div id="error-box" class="error-box hidden"></div>
+
+  <!-- Summary bar -->
+  <div id="summary-bar" class="hidden">
+    <div class="summary-stat ok">
+      <div class="dot"></div>
+      <span id="cnt-ok">0</span> OK
+    </div>
+    <div class="summary-stat" style="background:var(--c-reach-bg);color:var(--c-reach);border:1px solid var(--c-reach-bdr);">
+      <div class="dot"></div>
+      <span id="cnt-reach">0</span> Reachable
+    </div>
+    <div class="summary-stat err">
+      <div class="dot"></div>
+      <span id="cnt-err">0</span> Down
+    </div>
+    <div class="summary-meta" id="summary-meta"></div>
+  </div>
+
+  <!-- Tag filter -->
+  <div id="tag-filter" class="hidden"></div>
+
+  <!-- Results grid -->
+  <div id="results-grid">
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Selecciona un ambiente, tenant y email, luego haz clic en <strong>Verificar salud</strong>.
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── State ──────────────────────────────────────────────────────────────── */
+let config        = null;
+let activeTag     = 'all';
+let lastResults   = [];
+
+/* ── DOM refs ───────────────────────────────────────────────────────────── */
+const selEnv      = document.getElementById('sel-env');
+const selTenant   = document.getElementById('sel-tenant');
+const inpEmail    = document.getElementById('inp-email');
+const btnRun      = document.getElementById('btn-run');
+const errorBox    = document.getElementById('error-box');
+const summaryBar  = document.getElementById('summary-bar');
+const tagFilter   = document.getElementById('tag-filter');
+const grid        = document.getElementById('results-grid');
+const navLastCheck= document.getElementById('nav-last-check');
+const cntOk       = document.getElementById('cnt-ok');
+const cntReach    = document.getElementById('cnt-reach');
+const cntErr      = document.getElementById('cnt-err');
+const summaryMeta = document.getElementById('summary-meta');
+
+/* ── Boot — load config ──────────────────────────────────────────────────── */
+async function boot() {
+  try {
+    const r = await fetch('/api/config');
+    config  = await r.json();
+    populateEnvs();
+    restoreLastSettings();
+  } catch (e) {
+    showError('No se pudo cargar la configuración del servidor: ' + e.message);
+  }
+}
+
+function populateEnvs() {
+  selEnv.innerHTML = config.environments
+    .map(e => `<option value="${e.key}">${e.label}</option>`)
+    .join('');
+  updateTenants();
+}
+
+function updateTenants() {
+  const env = selEnv.value;
+  const key = env === 'qa' ? 'qa' : env === 'stg' ? 'stg' : 'prod';
+  const list = (config.tenants[key] || []);
+
+  selTenant.innerHTML = `<option value="">— elige tenant —</option>` +
+    list.map(t => `<option value="${t.quti}">${t.client} (${t.quti})</option>`).join('');
+
+  updateRunBtn();
+}
+
+function updateRunBtn() {
+  const ready = selTenant.value && inpEmail.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+  btnRun.disabled = !ready;
+}
+
+/* ── Persist last-used settings ─────────────────────────────────────────── */
+function saveLastSettings() {
+  try {
+    localStorage.setItem('dd-health-env',    selEnv.value);
+    localStorage.setItem('dd-health-tenant', selTenant.value);
+    localStorage.setItem('dd-health-email',  inpEmail.value);
+  } catch {}
+}
+
+function restoreLastSettings() {
+  try {
+    const env    = localStorage.getItem('dd-health-env');
+    const tenant = localStorage.getItem('dd-health-tenant');
+    const email  = localStorage.getItem('dd-health-email');
+    if (env && selEnv.querySelector(`option[value="${env}"]`)) {
+      selEnv.value = env;
+      updateTenants();
+    }
+    if (tenant) {
+      // tenant might not exist yet; set after tenants populated
+      setTimeout(() => {
+        if (selTenant.querySelector(`option[value="${tenant}"]`)) {
+          selTenant.value = tenant;
+          updateRunBtn();
+        }
+      }, 0);
+    }
+    if (email) inpEmail.value = email;
+    updateRunBtn();
+  } catch {}
+}
+
+/* ── Event listeners ─────────────────────────────────────────────────────── */
+selEnv.addEventListener('change', () => { updateTenants(); updateRunBtn(); });
+selTenant.addEventListener('change', updateRunBtn);
+inpEmail.addEventListener('input', updateRunBtn);
+
+btnRun.addEventListener('click', runChecks);
+
+/* ── Run health checks ───────────────────────────────────────────────────── */
+async function runChecks() {
+  hideError();
+  saveLastSettings();
+  setRunning(true);
+  renderSkeletons();
+
+  try {
+    const r = await fetch('/api/health', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({
+        env  : selEnv.value,
+        quti : selTenant.value,
+        email: inpEmail.value,
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) { showError(data.error || 'Error del servidor.'); setRunning(false); return; }
+
+    lastResults = data.results;
+    renderResults(data);
+  } catch (e) {
+    showError('Error de red: ' + e.message);
+  } finally {
+    setRunning(false);
+  }
+}
+
+/* ── Render ──────────────────────────────────────────────────────────────── */
+
+function renderSkeletons() {
+  const checks = config ? config.checks : [];
+  grid.innerHTML = checks.map(c => `
+    <div class="check-card running" id="card-${c.id}">
+      <div class="card-header">
+        <div class="card-label">${escHtml(c.label)}</div>
+        <div class="status-badge idle"><div class="dot"></div> Checking…</div>
+      </div>
+      <div class="card-meta">
+        <span class="method-badge ${c.method}">${c.method}</span>
+        <span class="card-path">${escHtml(c.path)}</span>
+        ${c.probe ? `<span style="font-size:.7rem;padding:2px 6px;border-radius:4px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;">probe</span>` : ''}
+      </div>
+      <div class="card-stats">
+        <div class="stat-item"><div class="stat-label">HTTP</div><div class="stat-value idle">—</div></div>
+        <div class="stat-item"><div class="stat-label">Tiempo</div><div class="stat-value idle">—</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderResults(data) {
+  // Build all tags
+  const allTags = ['all', ...new Set(data.results.map(r => r.tag))];
+
+  // Tag filter
+  tagFilter.classList.remove('hidden');
+  tagFilter.innerHTML = allTags.map(t => `
+    <button class="tag-btn ${t === activeTag ? 'active' : ''}" data-tag="${t}">
+      ${t === 'all' ? 'Todos' : t}
+    </button>
+  `).join('');
+  tagFilter.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTag = btn.dataset.tag;
+      tagFilter.querySelectorAll('.tag-btn').forEach(b => b.classList.toggle('active', b.dataset.tag === activeTag));
+      filterCards();
+    });
+  });
+
+  // Count
+  let ok = 0, reach = 0, err = 0;
+  for (const r of data.results) {
+    const { cls } = cardStatus(r);
+    if (cls === 'ok')    ok++;
+    else if (cls === 'reach') reach++;
+    else err++;
+  }
+  cntOk.textContent    = ok;
+  cntReach.textContent = reach;
+  cntErr.textContent   = err;
+  const avgMs = Math.round(data.results.reduce((a, r) => a + r.ms, 0) / data.results.length);
+  summaryMeta.textContent = `${data.results.length} endpoints · avg ${avgMs}ms · ${data.baseUrl}`;
+  summaryBar.classList.remove('hidden');
+
+  // Last check
+  const dt = new Date(data.checkedAt);
+  navLastCheck.textContent = `Última verificación: ${dt.toLocaleTimeString()}`;
+
+  // Render cards
+  grid.innerHTML = data.results.map(r => buildCard(r)).join('');
+  filterCards();
+}
+
+function buildCard(r) {
+  const { cls, label } = cardStatus(r);
+  const msClass = r.ms < 500 ? 'ok' : r.ms < 2000 ? 'warn' : 'err';
+  const probeTag = r.probe
+    ? `<span title="Probe mode: 4xx = Reachable (API up, expected error for dummy data)" style="font-size:.7rem;padding:2px 6px;border-radius:4px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;">probe</span>`
+    : '';
+
+  return `
+    <div class="check-card status-${cls}" id="card-${r.id}" data-tag="${escHtml(r.tag)}">
+      <div class="card-header">
+        <div class="card-label">${escHtml(r.label)}</div>
+        <div class="status-badge ${cls}"><div class="dot"></div>${label}</div>
+      </div>
+      <div class="card-meta">
+        <span class="method-badge ${r.method}">${r.method}</span>
+        <span class="card-path">${escHtml(r.path)}</span>
+        ${probeTag}
+      </div>
+      <div class="card-stats">
+        <div class="stat-item">
+          <div class="stat-label">HTTP</div>
+          <div class="stat-value ${cls}">${r.status || '—'}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Tiempo</div>
+          <div class="stat-value ${msClass}">${r.ms}ms</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Tag</div>
+          <div class="stat-value idle">${escHtml(r.tag)}</div>
+        </div>
+      </div>
+      ${r.error ? `<div class="card-error">${escHtml(r.error)}</div>` : ''}
+    </div>
+  `;
+}
+
+function cardStatus(r) {
+  // Network/timeout error → Down
+  if (r.error && !r.status) return { cls: 'err', label: 'Down' };
+  // 5xx → Down regardless of probe mode
+  if (r.status >= 500)      return { cls: 'err', label: r.status.toString() };
+  // 2xx → OK always
+  if (r.ok)                 return { cls: 'ok',  label: 'OK' };
+  // probe mode: 4xx = API is reachable (expected error with dummy data)
+  if (r.probe && r.status >= 400 && r.status < 500)
+                            return { cls: 'reach', label: 'Reachable' };
+  // non-probe 4xx → warn (real auth/config issue)
+  if (r.status >= 400)      return { cls: 'warn', label: r.status.toString() };
+  return { cls: 'err', label: 'Down' };
+}
+
+function filterCards() {
+  grid.querySelectorAll('.check-card').forEach(card => {
+    card.classList.toggle(
+      'hidden',
+      activeTag !== 'all' && card.dataset.tag !== activeTag
+    );
+  });
+}
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
+
+function setRunning(v) {
+  btnRun.disabled       = v;
+  btnRun.innerHTML      = v
+    ? `<div class="spinner btn-spinner"></div> Verificando…`
+    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Verificar salud`;
+}
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.classList.remove('hidden');
+}
+function hideError() { errorBox.classList.add('hidden'); }
+
+function escHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ── Init ────────────────────────────────────────────────────────────────── */
+boot();
+</script>
+</body>
+</html>

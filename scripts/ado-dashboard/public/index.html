@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADO Dashboard — Dynamic Docs RnD</title>
+  <style>
+    /* ── Variables ─────────────────────────────────────────────── */
+    :root {
+      --primary:      #0078d4;
+      --primary-dk:   #005a9e;
+      --primary-lt:   #e8f3fc;
+      --accent:       #f0891e;
+      --bg:           #f4f6f8;
+      --card-bg:      #ffffff;
+      --border:       #d1d9e0;
+      --text:         #1a202c;
+      --text-sec:     #5a6a7e;
+      --radius:       8px;
+      --shadow:       0 1px 8px rgba(0,0,0,.09);
+      --transition:   .15s ease;
+
+      /* State colors */
+      --c-new:        #64748b;
+      --c-backlog:    #8b5cf6;
+      --c-analyze:    #3b82f6;
+      --c-develop:    #f59e0b;
+      --c-test:       #06b6d4;
+      --c-acceptance: #10b981;
+      --c-closed:     #374151;
+      --c-removed:    #ef4444;
+
+      /* Type colors */
+      --c-us:         #0078d4;
+      --c-bug:        #d93025;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    button { cursor: pointer; border: none; background: none; font: inherit; }
+    select, input { font: inherit; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .hidden { display: none !important; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 60px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box {
+      background: #fdecea; color: #c0392b;
+      border: 1px solid #f8c4c1;
+      border-radius: var(--radius);
+      padding: 12px 16px; font-size: .88rem;
+      margin: 20px 0;
+    }
+
+    /* ── Navbar ─────────────────────────────────────────────────── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 54px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    .nav-brand { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: -.01em; }
+    .nav-brand svg { width: 22px; height: 22px; }
+    .nav-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .sprint-select {
+      padding: 5px 10px;
+      border-radius: 6px; border: 1.5px solid rgba(255,255,255,.4);
+      background: rgba(255,255,255,.12);
+      color: #fff; font-size: .85rem;
+      min-width: 170px; cursor: pointer;
+      outline: none;
+    }
+    .sprint-select option { color: var(--text); background: #fff; }
+    .sprint-select:focus { border-color: rgba(255,255,255,.7); }
+
+    .filter-input {
+      padding: 5px 10px;
+      border-radius: 6px; border: 1.5px solid rgba(255,255,255,.4);
+      background: rgba(255,255,255,.12);
+      color: #fff; font-size: .85rem; width: 150px;
+      outline: none;
+    }
+    .filter-input::placeholder { color: rgba(255,255,255,.6); }
+    .filter-input:focus { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.18); }
+
+    .view-toggle { display: flex; border: 1.5px solid rgba(255,255,255,.4); border-radius: 6px; overflow: hidden; }
+    .view-btn {
+      padding: 5px 12px; color: rgba(255,255,255,.75); font-size: .82rem;
+      transition: background var(--transition), color var(--transition);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .view-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+    .view-btn.active { background: rgba(255,255,255,.25); color: #fff; font-weight: 600; }
+    .view-btn + .view-btn { border-left: 1.5px solid rgba(255,255,255,.4); }
+
+    .btn-refresh {
+      padding: 5px 10px; border-radius: 6px;
+      border: 1.5px solid rgba(255,255,255,.4);
+      color: rgba(255,255,255,.85); font-size: .82rem;
+      transition: background var(--transition);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-refresh:hover { background: rgba(255,255,255,.15); color: #fff; }
+    .btn-refresh:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Main ───────────────────────────────────────────────────── */
+    #main { padding: 20px 24px; max-width: 1600px; margin: 0 auto; }
+
+    /* ── Stats bar ──────────────────────────────────────────────── */
+    .stats-bar {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .stat-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: .8rem; font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+    .stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .stat-label { color: var(--text-sec); font-weight: 400; margin-left: 2px; }
+
+    /* ── List View ──────────────────────────────────────────────── */
+    .list-wrap { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: .88rem; }
+    thead th {
+      background: #f0f4f8; color: var(--text-sec);
+      font-size: .75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      padding: 10px 14px; text-align: left;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background var(--transition); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+    td { padding: 10px 14px; vertical-align: middle; }
+
+    .col-id    { width: 90px; }
+    .col-type  { width: 90px; }
+    .col-title { min-width: 260px; }
+    .col-state { width: 110px; }
+    .col-pri   { width: 80px; text-align: center; }
+    .col-pts   { width: 70px; text-align: center; }
+    .col-who   { width: 160px; }
+
+    .item-id { font-family: monospace; font-size: .85rem; }
+    .item-id a { color: var(--primary); font-weight: 600; }
+
+    .type-badge {
+      display: inline-block;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .type-us  { background: #dbeafe; color: #1e40af; }
+    .type-bug { background: #fee2e2; color: #b91c1c; }
+
+    .state-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: .75rem; font-weight: 600;
+      white-space: nowrap;
+    }
+    .state-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    .priority-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%;
+      font-size: .75rem; font-weight: 700;
+    }
+    .pri-1 { background: #fee2e2; color: #b91c1c; }
+    .pri-2 { background: #fef3c7; color: #92400e; }
+    .pri-3 { background: #f1f5f9; color: #475569; }
+    .pri-4 { background: #dcfce7; color: #166534; }
+
+    .assignee-cell { display: flex; align-items: center; gap: 7px; }
+    .avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .68rem; font-weight: 700; flex-shrink: 0;
+    }
+    .assignee-name { font-size: .82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+    .unassigned { color: var(--text-sec); font-style: italic; font-size: .82rem; }
+
+    /* ── State group rows (list view) ───────────────────────────── */
+    .state-group-row td {
+      background: #f0f4f8;
+      padding: 6px 14px;
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--text-sec);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Kanban View ────────────────────────────────────────────── */
+    .kanban-board {
+      display: flex; gap: 12px; align-items: flex-start;
+      overflow-x: auto; padding-bottom: 12px;
+    }
+    .kanban-col {
+      flex: 0 0 230px; min-width: 0;
+      background: #eef1f5;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .kanban-col-header {
+      padding: 10px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: .78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: #fff;
+    }
+    .kanban-count {
+      background: rgba(255,255,255,.3);
+      color: #fff; font-size: .72rem; font-weight: 700;
+      padding: 1px 7px; border-radius: 10px;
+    }
+    .kanban-cards {
+      padding: 8px;
+      display: flex; flex-direction: column; gap: 8px;
+      min-height: 60px;
+    }
+    .kanban-card {
+      background: var(--card-bg);
+      border-radius: 6px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      border-left: 3px solid var(--border);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .kanban-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+    .kanban-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 4px; }
+    .kanban-card-id { font-family: monospace; font-size: .75rem; color: var(--primary); font-weight: 600; }
+    .kanban-card-title { font-size: .82rem; font-weight: 600; line-height: 1.35; margin-bottom: 8px; color: var(--text); }
+    .kanban-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .kanban-card-assignee { display: flex; align-items: center; gap: 5px; min-width: 0; }
+    .kanban-card-assignee .assignee-name { font-size: .75rem; }
+    .kanban-card-meta { display: flex; align-items: center; gap: 4px; }
+
+    /* ── Empty state ────────────────────────────────────────────── */
+    .empty { text-align: center; color: var(--text-sec); padding: 60px 20px; }
+    .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+    /* ── State color helpers ────────────────────────────────────── */
+    .s-new        { background-color: var(--c-new); }
+    .s-backlog    { background-color: var(--c-backlog); }
+    .s-analyze    { background-color: var(--c-analyze); }
+    .s-develop    { background-color: var(--c-develop); }
+    .s-test       { background-color: var(--c-test); }
+    .s-acceptance { background-color: var(--c-acceptance); }
+    .s-closed     { background-color: var(--c-closed); }
+    .s-removed    { background-color: var(--c-removed); }
+
+    .s-new-bg        { background: #f1f5f9; color: var(--c-new); }
+    .s-backlog-bg    { background: #f5f3ff; color: var(--c-backlog); }
+    .s-analyze-bg    { background: #eff6ff; color: var(--c-analyze); }
+    .s-develop-bg    { background: #fffbeb; color: #b45309; }
+    .s-test-bg       { background: #ecfeff; color: #0e7490; }
+    .s-acceptance-bg { background: #f0fdf4; color: #15803d; }
+    .s-closed-bg     { background: #f8fafc; color: var(--c-closed); }
+    .s-removed-bg    { background: #fef2f2; color: var(--c-removed); }
+
+    /* ── Avatar colors ──────────────────────────────────────────── */
+    .av-0 { background: #3b82f6; }
+    .av-1 { background: #8b5cf6; }
+    .av-2 { background: #f59e0b; }
+    .av-3 { background: #10b981; }
+    .av-4 { background: #ef4444; }
+    .av-5 { background: #06b6d4; }
+    .av-6 { background: #e37f3e; }
+    .av-7 { background: #64748b; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="4" fill="rgba(255,255,255,0.2)"/>
+      <path d="M6 24L13 8l7 10 4-5 2 11H6z" fill="white" opacity="0.9"/>
+    </svg>
+    Dynamic Docs — ADO Board
+  </div>
+  <div class="nav-controls">
+    <select id="sprint-select" class="sprint-select">
+      <option value="">Cargando sprints…</option>
+    </select>
+    <input id="filter-assignee" type="text" class="filter-input" placeholder="Filtrar por persona…" />
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-list" onclick="setView('list')" title="Vista lista">
+        ☰ Lista
+      </button>
+      <button class="view-btn" id="btn-kanban" onclick="setView('kanban')" title="Vista kanban">
+        ⊞ Kanban
+      </button>
+    </div>
+    <button class="btn-refresh" id="btn-refresh" onclick="loadWorkItems()" title="Recargar">
+      ↺ Actualizar
+    </button>
+  </div>
+</nav>
+
+<!-- ── Main ────────────────────────────────────────────────────────────── -->
+<div id="main">
+  <div id="stats-bar" class="stats-bar"></div>
+  <div id="error-area"></div>
+  <div id="loading" class="spinner hidden"></div>
+
+  <!-- List view -->
+  <div id="view-list">
+    <div class="list-wrap">
+      <table id="items-table">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th class="col-type">Tipo</th>
+            <th class="col-title">Título</th>
+            <th class="col-state">Estado</th>
+            <th class="col-pri">Pri</th>
+            <th class="col-pts">Pts</th>
+            <th class="col-who">Asignado</th>
+          </tr>
+        </thead>
+        <tbody id="items-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Kanban view -->
+  <div id="view-kanban" class="hidden">
+    <div class="kanban-board" id="kanban-board"></div>
+  </div>
+</div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────────────
+
+const STATE_ORDER = ['New', 'Backlog', 'Analyze', 'Develop', 'Test', 'Acceptance', 'Closed', 'Removed'];
+const STATE_KEY   = s => s.toLowerCase().replace(/ /g, '-');
+
+const STATE_COLORS = {
+  new:        getComputedStyle(document.documentElement).getPropertyValue('--c-new').trim(),
+  backlog:    getComputedStyle(document.documentElement).getPropertyValue('--c-backlog').trim(),
+  analyze:    getComputedStyle(document.documentElement).getPropertyValue('--c-analyze').trim(),
+  develop:    getComputedStyle(document.documentElement).getPropertyValue('--c-develop').trim(),
+  test:       getComputedStyle(document.documentElement).getPropertyValue('--c-test').trim(),
+  acceptance: getComputedStyle(document.documentElement).getPropertyValue('--c-acceptance').trim(),
+  closed:     getComputedStyle(document.documentElement).getPropertyValue('--c-closed').trim(),
+  removed:    getComputedStyle(document.documentElement).getPropertyValue('--c-removed').trim(),
+};
+
+const ADO_BASE = 'https://quorumsoftware.visualstudio.com/Quorum/_workitems/edit/';
+const AVATAR_CLASSES = ['av-0','av-1','av-2','av-3','av-4','av-5','av-6','av-7'];
+
+// ── State ────────────────────────────────────────────────────────────────
+
+let allItems   = [];
+let currentView = 'list';
+const avatarMap = {};
+let avatarIdx   = 0;
+
+// ── Init ─────────────────────────────────────────────────────────────────
+
+(async () => {
+  await loadSprints();
+  const sel = document.getElementById('sprint-select');
+  if (sel.value) await loadWorkItems();
+
+  sel.addEventListener('change', () => loadWorkItems());
+  document.getElementById('filter-assignee').addEventListener('input', renderCurrentView);
+})();
+
+// ── API calls ────────────────────────────────────────────────────────────
+
+async function loadSprints() {
+  try {
+    const r    = await fetch('/api/sprints');
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+
+    const sprints = (data.value || []).sort((a, b) => {
+      const tf = { past: -1, current: 0, future: 1 };
+      return (tf[a.attributes?.timeFrame] ?? 0) - (tf[b.attributes?.timeFrame] ?? 0);
+    });
+
+    const sel = document.getElementById('sprint-select');
+    sel.innerHTML = sprints.map(s => {
+      const isCurrent = s.attributes?.timeFrame === 'current';
+      return `<option value="${esc(s.path)}" ${isCurrent ? 'selected' : ''}>${esc(s.name)}${isCurrent ? ' ★' : ''}</option>`;
+    }).join('');
+  } catch (e) {
+    showError(`Error cargando sprints: ${e.message}`);
+  }
+}
+
+async function loadWorkItems() {
+  const iterationPath = document.getElementById('sprint-select').value;
+  if (!iterationPath) return;
+
+  setLoading(true);
+  clearError();
+
+  try {
+    const r    = await fetch(`/api/workitems?iterationPath=${encodeURIComponent(iterationPath)}`);
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+
+    allItems = (data.value || []).map(item => ({
+      id       : item.id,
+      title    : item.fields['System.Title']         || '(sin título)',
+      type     : item.fields['System.WorkItemType']  || '',
+      state    : item.fields['System.State']         || '',
+      assignee : item.fields['System.AssignedTo']    || null,
+      priority : item.fields['Microsoft.VSTS.Common.Priority'],
+      points   : item.fields['Microsoft.VSTS.Scheduling.StoryPoints'],
+      changed  : item.fields['System.ChangedDate'],
+    }));
+
+    renderCurrentView();
+    renderStats();
+  } catch (e) {
+    showError(`Error cargando items: ${e.message}`);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── Render ───────────────────────────────────────────────────────────────
+
+function getFiltered() {
+  const q = document.getElementById('filter-assignee').value.trim().toLowerCase();
+  if (!q) return allItems;
+  return allItems.filter(i => {
+    const name = assigneeName(i.assignee).toLowerCase();
+    return name.includes(q);
+  });
+}
+
+function renderCurrentView() {
+  if (currentView === 'list') renderList();
+  else renderKanban();
+}
+
+function renderList() {
+  const items = getFiltered();
+  const tbody = document.getElementById('items-tbody');
+
+  // Sort by official state order, then priority
+  const sorted = [...items].sort((a, b) => {
+    const si = STATE_ORDER.indexOf(a.state);
+    const sj = STATE_ORDER.indexOf(b.state);
+    if (si !== sj) return (si === -1 ? 99 : si) - (sj === -1 ? 99 : sj);
+    return (a.priority || 9) - (b.priority || 9);
+  });
+
+  if (sorted.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><span class="empty-icon">📋</span>No hay items que mostrar</div></td></tr>`;
+    return;
+  }
+
+  let html = '';
+  let lastState = null;
+
+  for (const item of sorted) {
+    if (item.state !== lastState) {
+      const sc = stateColorClass(item.state);
+      html += `<tr class="state-group-row"><td colspan="7"><span class="state-dot ${sc}" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;"></span>${esc(item.state)}</td></tr>`;
+      lastState = item.state;
+    }
+    html += renderRow(item);
+  }
+
+  tbody.innerHTML = html;
+}
+
+function renderRow(item) {
+  const typeCls  = item.type === 'Bug' ? 'type-bug' : 'type-us';
+  const typeLabel = item.type === 'Bug' ? 'Bug' : 'US';
+  const sc        = stateColorClass(item.state);
+  const priCls    = `pri-${item.priority || 3}`;
+  const ptsLabel  = item.points != null ? item.points : '—';
+  const name      = assigneeName(item.assignee);
+  const initials  = avatarInitials(name);
+  const avClass   = getAvatarClass(name);
+
+  return `
+    <tr>
+      <td class="col-id item-id"><a href="${ADO_BASE}${item.id}" target="_blank" rel="noopener">#${item.id}</a></td>
+      <td class="col-type"><span class="type-badge ${typeCls}">${typeLabel}</span></td>
+      <td class="col-title">${esc(item.title)}</td>
+      <td class="col-state">
+        <span class="state-pill ${sc}-bg">
+          <span class="state-dot ${sc}"></span>${esc(item.state)}
+        </span>
+      </td>
+      <td class="col-pri"><span class="priority-badge ${priCls}">${item.priority || '—'}</span></td>
+      <td class="col-pts" style="color:var(--text-sec)">${ptsLabel}</td>
+      <td class="col-who">
+        ${name !== 'Sin asignar'
+          ? `<div class="assignee-cell"><div class="avatar ${avClass}">${initials}</div><span class="assignee-name" title="${esc(name)}">${esc(firstName(name))}</span></div>`
+          : `<span class="unassigned">Sin asignar</span>`}
+      </td>
+    </tr>`;
+}
+
+function renderKanban() {
+  const items    = getFiltered();
+  const board    = document.getElementById('kanban-board');
+  const byState  = {};
+
+  for (const s of STATE_ORDER) byState[s] = [];
+  for (const item of items) {
+    if (!byState[item.state]) byState[item.state] = [];
+    byState[item.state].push(item);
+  }
+
+  // Only render columns that have items OR are in the "active" set
+  const activeCols = ['New', 'Analyze', 'Develop', 'Test', 'Acceptance', 'Closed'];
+  const cols = STATE_ORDER.filter(s => activeCols.includes(s) || (byState[s] && byState[s].length > 0));
+
+  if (items.length === 0) {
+    board.innerHTML = `<div class="empty"><span class="empty-icon">📋</span>No hay items que mostrar</div>`;
+    return;
+  }
+
+  board.innerHTML = cols.map(state => {
+    const colItems = (byState[state] || []).sort((a, b) => (a.priority || 9) - (b.priority || 9));
+    const sc       = stateColorClass(state);
+    const color    = STATE_COLORS[sc.replace('s-', '')] || '#64748b';
+    const count    = colItems.length;
+    const isTestCol = state === 'Test';
+
+    const cards = colItems.map(item => {
+      const typeCls   = item.type === 'Bug' ? 'type-bug' : 'type-us';
+      const typeLabel = item.type === 'Bug' ? 'Bug' : 'US';
+      const priCls    = `pri-${item.priority || 3}`;
+      const name      = assigneeName(item.assignee);
+      const initials  = avatarInitials(name);
+      const avClass   = getAvatarClass(name);
+      const leftColor = item.type === 'Bug' ? 'var(--c-bug)' : 'var(--c-us)';
+
+      const isTest = state === 'Test';
+
+      return `
+        <div class="kanban-card" style="border-left-color:${leftColor}" ${isTest ? `data-test-id="${item.id}"` : ''}>
+          <div class="kanban-card-top">
+            <a class="kanban-card-id" href="${ADO_BASE}${item.id}" target="_blank" rel="noopener">#${item.id}</a>
+            <div style="display:flex;gap:4px;align-items:center">
+              <span class="type-badge ${typeCls}">${typeLabel}</span>
+              <span class="priority-badge ${priCls}" style="width:20px;height:20px;font-size:.7rem">${item.priority || '—'}</span>
+            </div>
+          </div>
+          <div class="kanban-card-title">${esc(item.title)}</div>
+          <div class="kanban-card-footer">
+            <div class="kanban-card-assignee">
+              ${name !== 'Sin asignar'
+                ? `<div class="avatar ${avClass}" style="width:22px;height:22px;font-size:.62rem">${initials}</div><span class="assignee-name" title="${esc(name)}">${esc(firstName(name))}</span>`
+                : `<span class="unassigned" style="font-size:.75rem">Sin asignar</span>`}
+            </div>
+            <div style="display:flex;align-items:center;gap:4px">
+              ${isTest ? `<span class="test-date-chip" data-id="${item.id}" style="font-size:.7rem;color:var(--c-test);background:#ecfeff;padding:1px 7px;border-radius:10px;border:1px solid #a5f3fc">⟳</span>` : ''}
+              ${item.points != null ? `<span style="font-size:.72rem;color:var(--text-sec);background:#f1f5f9;padding:1px 6px;border-radius:10px">${item.points} pts</span>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="kanban-col">
+        <div class="kanban-col-header" style="background:${color}">
+          <span>${esc(state)}</span>
+          <span class="kanban-count">${count}</span>
+        </div>
+        <div class="kanban-cards">${cards || `<div style="padding:10px;text-align:center;color:#94a3b8;font-size:.78rem">—</div>`}</div>
+      </div>`;
+  }).join('');
+
+  // Cargar fechas de entrada a Test de forma asíncrona
+  const testItems = allItems.filter(i => i.state === 'Test');
+  if (testItems.length) loadTestDates(testItems.map(i => i.id));
+}
+
+async function loadTestDates(ids) {
+  try {
+    const r    = await fetch('/api/state-dates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids, state: 'Test' }),
+    });
+    const data = await r.json();
+    for (const [id, rawDate] of Object.entries(data)) {
+      const chip = document.querySelector(`.test-date-chip[data-id="${id}"]`);
+      if (!chip) continue;
+      if (rawDate) {
+        const d = new Date(rawDate);
+        const label = d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
+        chip.textContent = `📅 ${label}`;
+        chip.title = `Entró a Test el ${d.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' })}`;
+      } else {
+        chip.style.display = 'none';
+      }
+    }
+  } catch { /* silencioso */ }
+}
+
+function renderStats() {
+  const bar = document.getElementById('stats-bar');
+  if (!allItems.length) { bar.innerHTML = ''; return; }
+
+  const counts = {};
+  for (const item of allItems) counts[item.state] = (counts[item.state] || 0) + 1;
+
+  const total = allItems.length;
+  const chips = STATE_ORDER
+    .filter(s => counts[s])
+    .map(s => {
+      const sc = stateColorClass(s);
+      return `<div class="stat-chip">
+        <span class="stat-dot ${sc}"></span>
+        <span>${counts[s]}</span>
+        <span class="stat-label">${s}</span>
+      </div>`;
+    }).join('');
+
+  bar.innerHTML = `
+    <div class="stat-chip" style="background:var(--primary);color:#fff;border-color:var(--primary)">
+      <span>📋</span><span>${total}</span><span class="stat-label" style="color:rgba(255,255,255,.8)">Total</span>
+    </div>
+    ${chips}`;
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+
+function setView(view) {
+  currentView = view;
+  document.getElementById('view-list').classList.toggle('hidden', view !== 'list');
+  document.getElementById('view-kanban').classList.toggle('hidden', view !== 'kanban');
+  document.getElementById('btn-list').classList.toggle('active', view === 'list');
+  document.getElementById('btn-kanban').classList.toggle('active', view === 'kanban');
+  renderCurrentView();
+}
+
+function stateColorClass(state) {
+  const k = (state || '').toLowerCase();
+  if (k === 'new')        return 's-new';
+  if (k === 'backlog')    return 's-backlog';
+  if (k === 'analyze')    return 's-analyze';
+  if (k === 'develop')    return 's-develop';
+  if (k === 'test')       return 's-test';
+  if (k === 'acceptance') return 's-acceptance';
+  if (k === 'closed')     return 's-closed';
+  if (k === 'removed')    return 's-removed';
+  return 's-new';
+}
+
+function assigneeName(assignee) {
+  if (!assignee) return 'Sin asignar';
+  return assignee.displayName || assignee.name || 'Sin asignar';
+}
+
+function avatarInitials(name) {
+  if (name === 'Sin asignar') return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
+function firstName(name) {
+  return name.split(/\s+/)[0];
+}
+
+function getAvatarClass(name) {
+  if (!avatarMap[name]) {
+    avatarMap[name] = AVATAR_CLASSES[avatarIdx % AVATAR_CLASSES.length];
+    avatarIdx++;
+  }
+  return avatarMap[name];
+}
+
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function setLoading(on) {
+  document.getElementById('loading').classList.toggle('hidden', !on);
+  document.getElementById('btn-refresh').disabled = on;
+  document.getElementById('view-list').classList.toggle('hidden', on || currentView !== 'list');
+  document.getElementById('view-kanban').classList.toggle('hidden', on || currentView !== 'kanban');
+}
+
+function showError(msg) {
+  document.getElementById('error-area').innerHTML = `<div class="error-box">⚠️ ${esc(msg)}</div>`;
+}
+
+function clearError() {
+  document.getElementById('error-area').innerHTML = '';
+}
+</script>
+</body>
+</html>
