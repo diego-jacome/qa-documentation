@@ -1,5 +1,6 @@
 # Variables de entorno — NUNCA subir al repo
 .env
+scripts/k6/.env
 
 # Token cache de Outlook/MSAL — contiene tokens de acceso personales
 token_cache.json

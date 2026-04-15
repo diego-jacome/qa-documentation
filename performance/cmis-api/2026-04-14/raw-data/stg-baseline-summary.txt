@@ -1,0 +1,25 @@
+     ✓ createDocument: status 2xx
+     ✓ getObject: status 2xx
+     ✓ getContentStream: status 2xx
+
+     checks.........................: 100.00% ✓ 1500     ✗ 0   
+   ✓ create_document_duration.......: avg=2.17s    min=1.53s    med=2.11s    max=5.18s    p(90)=2.56s    p(95)=2.76s   
+     data_received..................: 1.6 GB  2.0 MB/s
+     data_sent......................: 2.1 GB  2.6 MB/s
+   ✓ errors.........................: 0.00%   ✓ 0        ✗ 1500
+   ✓ get_content_stream_duration....: avg=1.5s     min=788.94ms med=1.43s    max=4.27s    p(90)=2.05s    p(95)=2.3s    
+   ✓ get_object_duration............: avg=864.84ms min=391.02ms med=807.02ms max=2.22s    p(90)=1.24s    p(95)=1.34s   
+     http_req_blocked...............: avg=1.04ms   min=0s       med=0s       max=619.75ms p(90)=0s       p(95)=0s      
+     http_req_connecting............: avg=288.01µs min=0s       med=0s       max=108.49ms p(90)=0s       p(95)=0s      
+     http_req_duration..............: avg=1.3s     min=127.21ms med=1.13s    max=5.18s    p(90)=2.23s    p(95)=2.44s   
+       { expected_response:true }...: avg=1.3s     min=127.21ms med=1.13s    max=5.18s    p(90)=2.23s    p(95)=2.44s   
+     http_req_failed................: 0.00%   ✓ 0        ✗ 2004
+     http_req_receiving.............: avg=164.29ms min=0s       med=0s       max=3.25s    p(90)=643.59ms p(95)=871.25ms
+     http_req_sending...............: avg=128.83ms min=0s       med=0s       max=1.79s    p(90)=527.56ms p(95)=674.71ms
+     http_req_tls_handshaking.......: avg=602.33µs min=0s       med=0s       max=215.39ms p(90)=0s       p(95)=0s      
+     http_req_waiting...............: avg=1s       min=126.69ms med=831.87ms max=4.72s    p(90)=1.65s    p(95)=1.78s   
+     http_reqs......................: 2004    2.484119/s
+     iteration_duration.............: avg=4.54s    min=2.94s    med=4.47s    max=8.16s    p(90)=5.53s    p(95)=5.86s   
+     iterations.....................: 500     0.61979/s
+     vus............................: 0       min=0      max=5 
+     vus_max........................: 5       min=5      max=5 

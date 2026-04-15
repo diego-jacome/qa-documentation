@@ -1,0 +1,27 @@
+     ✗ createDocument: status 2xx
+      ↳  0% — ✓ 0 / ✗ 500
+     ✗ getObject: status 2xx
+      ↳  0% — ✓ 0 / ✗ 500
+     ✗ getContentStream: status 2xx
+      ↳  0% — ✓ 0 / ✗ 500
+
+     checks........................: 0.00%   ✓ 0        ✗ 1500
+   ✓ create_document_duration......: avg=1.48s    min=631.12ms med=1.18s    max=25.76s   p(90)=1.76s    p(95)=2.13s   
+     data_received.................: 6.0 MB  29 kB/s
+     data_sent.....................: 2.1 GB  10 MB/s
+   ✗ errors........................: 100.00% ✓ 1500     ✗ 0   
+   ✓ get_content_stream_duration...: avg=238.2ms  min=149.45ms med=205.29ms max=5.39s    p(90)=297.05ms p(95)=340.4ms 
+   ✓ get_object_duration...........: avg=233.44ms min=137.83ms med=194.55ms max=5.35s    p(90)=289.51ms p(95)=330.57ms
+     http_req_blocked..............: avg=2.89ms   min=0s       med=0s       max=794.75ms p(90)=0s       p(95)=0s      
+     http_req_connecting...........: avg=579.16µs min=0s       med=0s       max=147.76ms p(90)=0s       p(95)=0s      
+     http_req_duration.............: avg=650.57ms min=137.83ms med=240.16ms max=25.76s   p(90)=1.36s    p(95)=1.64s   
+     http_req_failed...............: 100.00% ✓ 1501     ✗ 0   
+     http_req_receiving............: avg=17.29ms  min=0s       med=0s       max=1.04s    p(90)=69.22ms  p(95)=87.92ms 
+     http_req_sending..............: avg=259.06ms min=0s       med=0s       max=25.23s   p(90)=769.04ms p(95)=942.52ms
+     http_req_tls_handshaking......: avg=1.18ms   min=0s       med=0s       max=307.3ms  p(90)=0s       p(95)=0s      
+     http_req_waiting..............: avg=374.21ms min=137.83ms med=209.67ms max=16.99s   p(90)=604.52ms p(95)=889.67ms
+     http_reqs.....................: 1501    7.352198/s
+     iteration_duration............: avg=1.96s    min=1.03s    med=1.6s     max=26.31s   p(90)=2.26s    p(95)=3s      
+     iterations....................: 500     2.4491/s
+     vus...........................: 0       min=0      max=5 
+     vus_max.......................: 5       min=5      max=5 
